@@ -1,0 +1,1 @@
+decoration: BoxDecoration(image: new DecorationImage(image: new AssetImage("assets/images/fictuneBackground1.jpg"), fit: BoxFit.cover,))
