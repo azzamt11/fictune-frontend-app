@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
@@ -56,6 +55,13 @@ class NetworkHandler {
       "Content-type": "application/json",
       "Authorization": "Bearer $token"
     });
+    return response;
+  }
+
+  Future<http.Response> register(String url, Map<String, String> body) async {
+    url = formater(url);
+    var response = await http.post(Uri.parse(url), body: json.encode(body));
+    var decodedResponse= json.decode(response.body);  //updated
     return response;
   }
 
