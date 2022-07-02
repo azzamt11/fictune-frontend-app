@@ -55,8 +55,8 @@ class _homePageState extends State<homePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
-                              padding: EdgeInsets.only(left: 15, top: 15, bottom: 15),
-                              child: Text('New Arrivals', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color.fromRGBO(50, 0, 100, 1))),
+                            padding: EdgeInsets.only(left: 15, top: 15, bottom: 15),
+                            child: Text('New Arrivals', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color.fromRGBO(50, 0, 100, 1))),
                           ),
                           Container(
                             height: 1,
@@ -66,15 +66,17 @@ class _homePageState extends State<homePage> {
                           ),
                           Padding(
                             padding: EdgeInsets.only(left: 15, right: 15),
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
+                            child: Container(
+                              height: 150,
+                              width: size.width,
+                              child: ListView(
+                                  scrollDirection: Axis.horizontal,
                                   children: [
                                     Container(height: 150, color: Colors.redAccent, width: 100, margin: EdgeInsets.only(right: 10)),
                                     Container(height: 150, color: Colors.greenAccent, width: 100, margin: EdgeInsets.only(right: 10)),
                                     Container(height: 150, color: Colors.blueAccent, width: 100, margin: EdgeInsets.only(right: 10)),
                                     Container(height: 150, color: Colors.yellowAccent, width: 100, margin: EdgeInsets.only(right: 10)),
-                                    Container(height: 150, color: Colors.grey, width: 100, margin: EdgeInsets.only(right: 10)),
+                                    Container(height: 150, color: Colors.purpleAccent, width: 100, margin: EdgeInsets.only(right: 10)),
                                   ]
                               ),
                             ),
@@ -96,16 +98,14 @@ class _homePageState extends State<homePage> {
                           ),
                           Padding(
                             padding: EdgeInsets.only(left: 15, right: 15),
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                  children: [
-                                    Container(height: 150, color: Colors.redAccent, width: 100, margin: EdgeInsets.only(right: 10)),
-                                    Container(height: 150, color: Colors.greenAccent, width: 100, margin: EdgeInsets.only(right: 10)),
-                                    Container(height: 150, color: Colors.blueAccent, width: 100, margin: EdgeInsets.only(right: 10)),
-                                    Container(height: 150, color: Colors.yellowAccent, width: 100, margin: EdgeInsets.only(right: 10)),
-                                    Container(height: 150, color: Colors.grey, width: 100, margin: EdgeInsets.only(right: 10)),
-                                  ]
+                            child: Container(
+                              height: 150,
+                              width: size.width,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: 10,
+                                separatorBuilder: (context, _)=> SizedBox(width: 10),
+                                itemBuilder: (context, index)=> _buildCard(index),
                               ),
                             ),
                           )
@@ -126,15 +126,17 @@ class _homePageState extends State<homePage> {
                           ),
                           Padding(
                             padding: EdgeInsets.only(left: 15, right: 15),
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
+                            child: Container(
+                              height: 150,
+                              width: size.width,
+                              child: ListView(
+                                  scrollDirection: Axis.horizontal,
                                   children: [
                                     Container(height: 150, color: Colors.redAccent, width: 100, margin: EdgeInsets.only(right: 10)),
                                     Container(height: 150, color: Colors.greenAccent, width: 100, margin: EdgeInsets.only(right: 10)),
                                     Container(height: 150, color: Colors.blueAccent, width: 100, margin: EdgeInsets.only(right: 10)),
                                     Container(height: 150, color: Colors.yellowAccent, width: 100, margin: EdgeInsets.only(right: 10)),
-                                    Container(height: 150, color: Colors.grey, width: 100, margin: EdgeInsets.only(right: 10)),
+                                    Container(height: 150, color: Colors.purpleAccent, width: 100, margin: EdgeInsets.only(right: 10)),
                                   ]
                               ),
                             ),
@@ -150,4 +152,19 @@ class _homePageState extends State<homePage> {
       ]
     );
   }
+
+  Widget _buildCard(int index) {
+    return GestureDetector(
+      onTap: () {
+        //just do nothing for a while
+      },
+      child: Container(
+        height: 150,
+        width: 100,
+        decoration: BoxDecoration(color: Colors.orange),
+        child: Text('${index}th novel', style: TextStyle(fontSize: 20)),
+      )
+    );
+  }
 }
+
