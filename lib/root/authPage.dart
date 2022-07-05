@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../network/networkHandler.dart';
 
 class authPage extends StatefulWidget {
   const authPage({Key? key}) : super(key: key);
@@ -9,6 +12,18 @@ class authPage extends StatefulWidget {
 }
 
 class _authPageState extends State<authPage> {
+  var message= 'initial message';
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     var size= MediaQuery.of(context).size;
@@ -31,52 +46,17 @@ class _authPageState extends State<authPage> {
             color: Colors.black54,
             child: Center(
               child: Container(
-                  height: 280,
-                  width: 300,
+                  height: 300,
+                  width: 280,
                   decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
                   child: Column(
                       children: [
-                        Padding(
-                            padding: EdgeInsets.only(top: 20, bottom: 20),
-                            child: Text('Login to Fictune', style: TextStyle(fontSize: 20, color: Color.fromRGBO(50, 0, 100,1), fontWeight: FontWeight.bold))
-                        ),
-                        Padding(
-                            child: TextField(decoration: new InputDecoration(border: InputBorder.none, focusedBorder: InputBorder.none, enabledBorder: InputBorder.none, errorBorder: InputBorder.none, disabledBorder: InputBorder.none, hintText: "Email")),
-                            padding: EdgeInsets.only(left: 30, right: 30, top: 10)
-                        ),
-                        Container(
-                            height: 1,
-                            width: 240,
-                            color: Color.fromRGBO(50, 0, 100, 1)
-                        ),
-                        Padding(
-                            child: TextField(decoration: new InputDecoration(border: InputBorder.none, focusedBorder: InputBorder.none, enabledBorder: InputBorder.none, errorBorder: InputBorder.none, disabledBorder: InputBorder.none, hintText: "Password")),
-                            padding: EdgeInsets.only(left: 30, right: 30, top: 10)
-                        ),
-                        Container(
-                            height: 1,
-                            width: 240,
-                            color: Color.fromRGBO(50, 0, 100, 1)
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            //just do nothing for a while.},
-                          },
-                          child: Center(
-                              child: Padding(
-                                  padding: EdgeInsets.only(top: 30),
-                                  child: Container(
-                                      height: 35,
-                                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Color.fromRGBO(50, 0, 100, 1)),
-                                      width: 80,
-                                      child: Padding(
-                                          padding: EdgeInsets.only(top: 5, left: 14),
-                                          child: Text('Login', style: TextStyle(fontSize: 20, color: Colors.white))
-                                      )
-                                  )
-                              )
-                          ),
-                        ),
+                        tittle(),
+                        inputTextField('email', emailController),
+                        purpleLine(),
+                        inputTextField('password', passwordController),
+                        purpleLine(),
+                        button()
                       ]
                   )
               ),
@@ -84,6 +64,74 @@ class _authPageState extends State<authPage> {
           ),
         ]
       ),
+    );
+  }
+
+  Widget tittle() {
+    return(
+        Padding(
+            padding: EdgeInsets.only(top: 20, bottom: 10),
+            child: Text('Login to Fictune', style: TextStyle(fontSize: 20, color: Color.fromRGBO(50, 0, 100,1), fontWeight: FontWeight.bold))
+        )
+    );
+  }
+
+  Widget inputTextField(String string, controller) {
+    return(
+        Container(
+          margin: EdgeInsets.only(left: 30, top: 20),
+          height: 25,
+          child: TextField(
+              controller: controller,
+              decoration: new InputDecoration(border: InputBorder.none, focusedBorder: InputBorder.none, enabledBorder: InputBorder.none, errorBorder: InputBorder.none, disabledBorder: InputBorder.none, hintText: string)
+          ),
+        )
+    );
+  }
+
+  Widget purpleLine() {
+    return(
+        Container(
+            height: 1,
+            width: 220,
+            color: Color.fromRGBO(50, 0, 100, 1)
+        )
+    );
+  }
+
+  Widget button() {
+    return(
+        GestureDetector(
+          onTap: () {
+            String typedEmail= emailController.text;
+            String typedPassword= passwordController.text;
+            var response= NetworkHandler().login('login', {'email': typedEmail, 'password': typedPassword});
+            final snackBar= SnackBar(
+              content: Text(message, style: TextStyle(fontSize: 15)),
+              backgroundColor: (Colors.black12),
+              action: SnackBarAction(
+                label: 'dismiss',
+                onPressed: () {
+                },
+              ),
+            );
+          },
+          child: Center(
+              child: Padding(
+                  padding: EdgeInsets.only(top: 25),
+                  child: Container(
+                      height: 34,
+                      margin: EdgeInsets.only(top: 10),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Color.fromRGBO(50, 0, 100, 1)),
+                      width: 70,
+                      padding: EdgeInsets.only(bottom: 3),
+                      child: Center(
+                          child: Text('Login', style: TextStyle(fontSize: 17, color: Colors.white))
+                      )
+                  )
+              )
+          ),
+        )
     );
   }
 }
