@@ -4,7 +4,6 @@ import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NetworkHandler {
-  String baseurl = "http://172.0.0.1:8000/api";
   var log = Logger();
 
   String _generateKey(String userId, String key) {
@@ -14,8 +13,7 @@ class NetworkHandler {
   //get function
   Future get(String url) async {
     var token= getString('user', 'token');
-    url = formater(url);
-    var response = await http.get(Uri.parse(url), headers: {"Authorization": "Bearer $token"});
+    var response = await http.get(Uri.parse("http://ftunebackend.herokuapp.com/api/$url"), headers: {"Authorization": "Bearer $token"});
     if (response.statusCode == 200 || response.statusCode == 201) {
       log.i(response.body);
 
@@ -28,9 +26,8 @@ class NetworkHandler {
   //post function
   Future<http.Response> post(String url, Map<String, String> body) async {
     var token= getString('user', 'token');
-    url = formater(url);
     log.d(body);
-    var response = await http.post(Uri.parse(url), headers: {
+    var response = await http.post(Uri.parse("http://ftunebackend.herokuapp.com/api/$url"), headers: {
         "Content-type": "application/json",
         "Authorization": "Bearer $token"
       },
@@ -42,9 +39,8 @@ class NetworkHandler {
   //put function
   Future<http.Response> put(String url, Map<String, String> body) async {
     var token= getString('user', 'token');
-    url = formater(url);
     log.d(body);
-    var response = await http.put(Uri.parse(url), headers: {
+    var response = await http.put(Uri.parse("http://ftunebackend.herokuapp.com/api/$url"), headers: {
         "Content-type": "application/json",
         "Authorization": "Bearer $token"
       },
@@ -56,8 +52,7 @@ class NetworkHandler {
   //delete function
   Future<http.Response> delete(String url) async {
     var token= getString('user', 'token');
-    url = formater(url);
-    var response = await http.delete(Uri.parse(url), headers: {
+    var response = await http.delete(Uri.parse("http://ftunebackend.herokuapp.com/api/$url"), headers: {
       "Content-type": "application/json",
       "Authorization": "Bearer $token",
       "Access-Control-Allow-Origin": "*"
@@ -67,20 +62,24 @@ class NetworkHandler {
 
   //login function
   Future<String?> login(String url, Map<String, String> body) async {
-    url = formater(url);
     try {
-      var response = await http.post(Uri.parse(url),
+      var response = await http.post(Uri.parse("http://ftunebackend.herokuapp.com/api/login"),
           headers: {
             "Content-type": "application/json",
             "Access-Control-Allow-Origin":"*"
           },
           body: json.encode(body));
       var decodedResponse= json.decode(response.body);
-      saveString('user', 'token', decodedResponse['token']);
-      print(decodedResponse);
-      return decodedResponse['message'];
+      saveString('user', 'token', decodedResponse['token'].toString());
+      saveString('user', 'user_name', decodedResponse['user']['name'].toString());
+      saveString('user', 'user_id', decodedResponse['user']['id'].toString());
+      saveString('user', 'user_email', decodedResponse['user']['email'].toString());
+      saveString('user', 'user_attribute', decodedResponse['user']['user_attribute_1'].toString());
+      print(decodedResponse['user']['name']);
+      return decodedResponse['token'];
     } catch(e) {
       print(e);
+      return null;
     }//updated
   }
 
@@ -93,9 +92,5 @@ class NetworkHandler {
   Future<String?> getString(String userId, String key) async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_generateKey(userId, key));
-  }
-
-  String formater(String url) {
-    return baseurl + url;
   }
 }

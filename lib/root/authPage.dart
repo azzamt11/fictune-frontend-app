@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fictune_frontend/root/rootPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../network/networkHandler.dart';
@@ -102,19 +103,13 @@ class _authPageState extends State<authPage> {
   Widget button() {
     return(
         GestureDetector(
-          onTap: () {
+          onTap: () async {
             String typedEmail= emailController.text;
             String typedPassword= passwordController.text;
-            var response= NetworkHandler().login('login', {'email': typedEmail, 'password': typedPassword});
-            final snackBar= SnackBar(
-              content: Text(message, style: TextStyle(fontSize: 15)),
-              backgroundColor: (Colors.black12),
-              action: SnackBarAction(
-                label: 'dismiss',
-                onPressed: () {
-                },
-              ),
-            );
+            var response= await NetworkHandler().login('login', {'email': typedEmail, 'password': typedPassword});
+            if (response!=null) {
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> rootPage()));
+            }
           },
           child: Center(
               child: Padding(

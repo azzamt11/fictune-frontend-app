@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import '../pages/homePage.dart';
 
 class rootPage extends StatefulWidget {
@@ -12,6 +12,7 @@ class rootPage extends StatefulWidget {
 
 class _rootPageState extends State<rootPage> {
   int activeTab= 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

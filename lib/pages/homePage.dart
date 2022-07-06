@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../components/mainPageView.dart';
 
@@ -13,13 +14,15 @@ class homePage extends StatefulWidget {
 class _homePageState extends State<homePage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: getBody(),
-    );
+    return FutureBuilder(future: getUserName(),builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+      if (!snapshot.hasData) {return Container();}else {
+        final String? userName= snapshot.data;
+        return getBody(userName);
+      }
+    });
   }
 
-  getBody() {
+  getBody(userName) {
     var size= MediaQuery.of(context).size;
     return CustomScrollView(
       slivers: [
@@ -28,6 +31,7 @@ class _homePageState extends State<homePage> {
           pinned: true,
           backgroundColor: Colors.white,
           actions: [
+            Container(height: 70, width: 150, child: Text(userName, style: TextStyle(color: Color.fromRGBO(50, 0, 100, 1), fontSize: 20))),
             Padding(
               padding: EdgeInsets.only(right: 15, bottom: 8, top: 8),
               child: Container(
@@ -165,6 +169,24 @@ class _homePageState extends State<homePage> {
         child: Text('${index}th novel', style: TextStyle(fontSize: 20)),
       )
     );
+  }
+
+  String _generateKey(String userId, String key) {
+    return '$userId/$key';
+  }
+
+  Future<String?> getString(String userId, String key) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_generateKey(userId, key));
+  }
+
+  Future<String> getUserName() async{
+    final userName= await getString('user', 'user_name');
+    if (userName!=null) {
+      return userName;
+    } else {
+      return 'user';
+    }
   }
 }
 
