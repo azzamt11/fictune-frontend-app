@@ -80,7 +80,7 @@ class _homePageState extends State<homePage> {
                                 scrollDirection: Axis.horizontal,
                                 itemCount: 10,
                                 separatorBuilder: (context, _)=> SizedBox(width: 10),
-                                itemBuilder: (context, index)=> _buildCard(index, 0),
+                                itemBuilder: (context, index)=> _buildCard(userData, 0, index),
                               ),
                             ),
                           )
@@ -108,7 +108,7 @@ class _homePageState extends State<homePage> {
                                 scrollDirection: Axis.horizontal,
                                 itemCount: 10,
                                 separatorBuilder: (context, _)=> SizedBox(width: 10),
-                                itemBuilder: (context, index)=> _buildCard(index, 1),
+                                itemBuilder: (context, index)=> _buildCard(userData, 1, index),
                               ),
                             ),
                           )
@@ -136,7 +136,7 @@ class _homePageState extends State<homePage> {
                                 scrollDirection: Axis.horizontal,
                                 itemCount: 10,
                                 separatorBuilder: (context, _)=> SizedBox(width: 10),
-                                itemBuilder: (context, index)=> _buildCard(index, 2),
+                                itemBuilder: (context, index)=> _buildCard(userData, 2, index),
                               ),
                             ),
                           )
@@ -152,28 +152,38 @@ class _homePageState extends State<homePage> {
     );
   }
 
-  //novel card
-  Widget _buildCard(int index, int genre) {
-    int row= 3;
-    int col= 3;
-    var novelImageMatrix= List.generate(row, (i)=> List.generate(col, (j)=> 'This is therow $i, column $j', growable: false), growable: false);
-    return GestureDetector(
-      onTap: () {
-        //just do nothing for a while
-      },
-      child: Container(
-        height: 150,
-        width: 100,
-        decoration: BoxDecoration(image: DecorationImage(image: MemoryImage(convertBase64Image(novelImageMatrix[genre][index])))),
-        child: Text('${index}th novel', style: TextStyle(fontSize: 20)),
-      )
-    );
-  }
-
   //additional functions:
   //key generator
   String _generateKey(String userId, String key) {
     return '$userId/$key';
+  }
+
+  //novel card
+  Widget _buildCard(String userData, int genre, int index) {
+    List<String> userDataArray= userData.split('%');
+    String userToken= userDataArray[2];
+    var imageCode= userPrefNovelImageCode();
+    return GestureDetector(
+        onTap: () {
+          //just do nothing for a while
+        },
+        child: Container(
+          height: 150,
+          width: 100,
+          decoration: BoxDecoration(image: DecorationImage(image: NetworkImage('http://ftunebackend.herokuapp.com/imageposts/$imageCode/$genre/$index'))),
+          child: Text('${index}th novel', style: TextStyle(fontSize: 20)),
+        )
+    );
+  }
+
+  //user preference novel image function
+  Future<String> userPrefNovelImageCode() async {
+    final userPrefList= await getString('user', 'user_pref');
+    if (userPrefList!=null) {
+      return userPrefList;
+    } else {
+      return '0';
+    }
   }
 
   //get string from shared pref
@@ -186,9 +196,9 @@ class _homePageState extends State<homePage> {
   Future<String> getUserData() async{
     final userName= await getString('user', 'user_name');
     final userAttribute= await getString('user', 'user_attribute');
-    print(userName);
+    final userToken= await getString('user', 'token');
     if (userName!=null) {
-      return '$userName%$userAttribute';
+      return '$userName%$userAttribute%$userToken';
     } else {
       return 'user';
     }

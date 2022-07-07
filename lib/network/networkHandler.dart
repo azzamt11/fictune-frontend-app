@@ -76,6 +76,7 @@ class NetworkHandler {
         saveString('user', 'user_id', decodedResponse['user']['id'].toString());
         saveString('user', 'user_email', decodedResponse['user']['email'].toString());
         saveString('user', 'user_attribute', decodedResponse['user']['user_attribute_1'].toString());
+        saveString('user', 'user_pref', decodedResponse['user']['user_attribute_2'].toString());
         print(getString('user', 'user_name'));
         String response1= decodedResponse['token'];
         String response2= decodedResponse['user']['name'];
