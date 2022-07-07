@@ -70,16 +70,24 @@ class NetworkHandler {
           },
           body: json.encode(body));
       var decodedResponse= json.decode(response.body);
-      saveString('user', 'token', decodedResponse['token'].toString());
-      saveString('user', 'user_name', decodedResponse['user']['name'].toString());
-      saveString('user', 'user_id', decodedResponse['user']['id'].toString());
-      saveString('user', 'user_email', decodedResponse['user']['email'].toString());
-      saveString('user', 'user_attribute', decodedResponse['user']['user_attribute_1'].toString());
-      print(decodedResponse['user']['name']);
-      return decodedResponse['token'];
+      if (decodedResponse['user']!=null) {
+        saveString('user', 'token', decodedResponse['token'].toString());
+        saveString('user', 'user_name', decodedResponse['user']['name'].toString());
+        saveString('user', 'user_id', decodedResponse['user']['id'].toString());
+        saveString('user', 'user_email', decodedResponse['user']['email'].toString());
+        saveString('user', 'user_attribute', decodedResponse['user']['user_attribute_1'].toString());
+        print(getString('user', 'user_name'));
+        String response1= decodedResponse['token'];
+        String response2= decodedResponse['user']['name'];
+        return "success%$response2%$response1";
+      } else if (decodedResponse['message']!=null) {
+        return "error%email or password is incorrect";
+      } else {
+        return "error%something went wrong";
+      }
     } catch(e) {
       print(e);
-      return null;
+      return "error%something went wrong";
     }//updated
   }
 

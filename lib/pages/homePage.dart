@@ -1,8 +1,12 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../components/mainPageView.dart';
 
+//home page constructor
 class homePage extends StatefulWidget {
   const homePage({Key? key}) : super(key: key);
 
@@ -10,18 +14,25 @@ class homePage extends StatefulWidget {
   State<homePage> createState() => _homePageState();
 }
 
+//home page state
 class _homePageState extends State<homePage> {
+  //build
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(future: getUserName(),builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-      if (!snapshot.hasData) {return Container();}else {
-        final String? userName= snapshot.data;
-        return getBody(userName);
+    return FutureBuilder(future: getUserData(),builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+      if (!snapshot.hasData) {return Container();}
+      else {
+        final String? userData= snapshot.data;
+        return getBody(userData);
       }
     });
   }
 
-  getBody(userName) {
+  //home main body
+  getBody(userData) {
+    List<String> userDataArray= userData.split('%');
+    String userName= userDataArray[0];
+    String userImage= userDataArray[1];
     var size= MediaQuery.of(context).size;
     return CustomScrollView(
       slivers: [
@@ -30,15 +41,8 @@ class _homePageState extends State<homePage> {
           pinned: true,
           backgroundColor: Colors.white,
           actions: [
-            Container(height: 70, width: 150, child: Text(userName, style: TextStyle(color: Color.fromRGBO(50, 0, 100, 1), fontSize: 20))),
-            Padding(
-              padding: EdgeInsets.only(right: 15, bottom: 8, top: 8),
-              child: Container(
-                height: 50,
-                width: 42,
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(26), color: Colors.red,)
-              )
-            )
+            Container(height: 70, width: 150, padding: EdgeInsets.only(right: 10), child: Center(child: Text(userName.toLowerCase().replaceAll(RegExp(' '), '_'), style: TextStyle(color: Color.fromRGBO(50, 0, 100, 1), fontSize: 20, overflow: TextOverflow.ellipsis)))),
+            Container(padding: EdgeInsets.only(right: 15), height: 70, child: Center(child: CircleAvatar(backgroundImage: MemoryImage(convertBase64Image(userImage)), radius: 25))),
           ],
           expandedHeight: size.height*0.45,
           flexibleSpace: FlexibleSpaceBar(
@@ -72,15 +76,11 @@ class _homePageState extends State<homePage> {
                             child: Container(
                               height: 150,
                               width: size.width,
-                              child: ListView(
-                                  scrollDirection: Axis.horizontal,
-                                  children: [
-                                    Container(height: 150, color: Colors.redAccent, width: 100, margin: EdgeInsets.only(right: 10)),
-                                    Container(height: 150, color: Colors.greenAccent, width: 100, margin: EdgeInsets.only(right: 10)),
-                                    Container(height: 150, color: Colors.blueAccent, width: 100, margin: EdgeInsets.only(right: 10)),
-                                    Container(height: 150, color: Colors.yellowAccent, width: 100, margin: EdgeInsets.only(right: 10)),
-                                    Container(height: 150, color: Colors.purpleAccent, width: 100, margin: EdgeInsets.only(right: 10)),
-                                  ]
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: 10,
+                                separatorBuilder: (context, _)=> SizedBox(width: 10),
+                                itemBuilder: (context, index)=> _buildCard(index, 0),
                               ),
                             ),
                           )
@@ -108,7 +108,7 @@ class _homePageState extends State<homePage> {
                                 scrollDirection: Axis.horizontal,
                                 itemCount: 10,
                                 separatorBuilder: (context, _)=> SizedBox(width: 10),
-                                itemBuilder: (context, index)=> _buildCard(index),
+                                itemBuilder: (context, index)=> _buildCard(index, 1),
                               ),
                             ),
                           )
@@ -119,7 +119,7 @@ class _homePageState extends State<homePage> {
                         children: [
                           Padding(
                             padding: EdgeInsets.only(left: 15, top: 15, bottom: 15),
-                            child: Text('Horror', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color.fromRGBO(50, 0, 100, 1))),
+                            child: Text('Psycological', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color.fromRGBO(50, 0, 100, 1))),
                           ),
                           Container(
                             height: 1,
@@ -132,15 +132,11 @@ class _homePageState extends State<homePage> {
                             child: Container(
                               height: 150,
                               width: size.width,
-                              child: ListView(
-                                  scrollDirection: Axis.horizontal,
-                                  children: [
-                                    Container(height: 150, color: Colors.redAccent, width: 100, margin: EdgeInsets.only(right: 10)),
-                                    Container(height: 150, color: Colors.greenAccent, width: 100, margin: EdgeInsets.only(right: 10)),
-                                    Container(height: 150, color: Colors.blueAccent, width: 100, margin: EdgeInsets.only(right: 10)),
-                                    Container(height: 150, color: Colors.yellowAccent, width: 100, margin: EdgeInsets.only(right: 10)),
-                                    Container(height: 150, color: Colors.purpleAccent, width: 100, margin: EdgeInsets.only(right: 10)),
-                                  ]
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: 10,
+                                separatorBuilder: (context, _)=> SizedBox(width: 10),
+                                itemBuilder: (context, index)=> _buildCard(index, 2),
                               ),
                             ),
                           )
@@ -156,7 +152,11 @@ class _homePageState extends State<homePage> {
     );
   }
 
-  Widget _buildCard(int index) {
+  //novel card
+  Widget _buildCard(int index, int genre) {
+    int row= 3;
+    int col= 3;
+    var novelImageMatrix= List.generate(row, (i)=> List.generate(col, (j)=> 'This is therow $i, column $j', growable: false), growable: false);
     return GestureDetector(
       onTap: () {
         //just do nothing for a while
@@ -164,28 +164,40 @@ class _homePageState extends State<homePage> {
       child: Container(
         height: 150,
         width: 100,
-        decoration: BoxDecoration(color: Colors.orange),
+        decoration: BoxDecoration(image: DecorationImage(image: MemoryImage(convertBase64Image(novelImageMatrix[genre][index])))),
         child: Text('${index}th novel', style: TextStyle(fontSize: 20)),
       )
     );
   }
 
+  //additional functions:
+  //key generator
   String _generateKey(String userId, String key) {
     return '$userId/$key';
   }
 
+  //get string from shared pref
   Future<String?> getString(String userId, String key) async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_generateKey(userId, key));
   }
 
-  Future<String> getUserName() async{
+  //get user_name from shared pref
+  Future<String> getUserData() async{
     final userName= await getString('user', 'user_name');
+    final userAttribute= await getString('user', 'user_attribute');
+    print(userName);
     if (userName!=null) {
-      return userName;
+      return '$userName%$userAttribute';
     } else {
       return 'user';
     }
+  }
+
+  //image conversion
+  Uint8List convertBase64Image(String base64String) {
+    Uint8List bytes= Base64Decoder().convert(base64String.split(',').last);
+    return bytes;
   }
 }
 
