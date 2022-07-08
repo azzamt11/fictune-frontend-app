@@ -117,7 +117,6 @@ class NetworkHandler {
         return "error%something went wrong";
       }
     } catch(e) {
-      print(e);
       return "error%something went wrong";
     }//updated
   }
