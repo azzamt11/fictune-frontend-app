@@ -1,6 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import '../network/DataProvider.dart';
 
 class NovelCard extends StatefulWidget {
