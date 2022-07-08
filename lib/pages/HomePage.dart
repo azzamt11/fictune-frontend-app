@@ -174,7 +174,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   //widgets and functions:
-
   //novel card
   Widget _buildCard(String userData, int genre, int index) {
     List<String> userDataArray= userData.split('%');

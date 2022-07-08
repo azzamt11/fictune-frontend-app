@@ -27,6 +27,10 @@ class _NovelCardState extends State<NovelCard> {
   }
 
   Widget getBody(String? userData) {
-    return Container();
+    return Container(
+      height: 150,
+      width: 100,
+      decoration: BoxDecoration(image: DecorationImage(image: NetworkImage('https://example/image'))),
+    );
   }
 }
