@@ -1,14 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class mainPageView extends StatefulWidget {
-  const mainPageView({Key? key}) : super(key: key);
+class MainPageView extends StatefulWidget {
+  const MainPageView({Key? key}) : super(key: key);
 
   @override
-  State<mainPageView> createState() => _mainPageViewState();
+  State<MainPageView> createState() => _MainPageViewState();
 }
 
-class _mainPageViewState extends State<mainPageView> {
+class _MainPageViewState extends State<MainPageView> {
   @override
   Widget build(BuildContext context) {
     var size= MediaQuery.of(context).size;

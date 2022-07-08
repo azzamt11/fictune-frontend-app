@@ -1,15 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../pages/homePage.dart';
+import '../pages/HomePage.dart';
 
-class rootPage extends StatefulWidget {
-  const rootPage({Key? key}) : super(key: key);
+class RootPage extends StatefulWidget {
+  const RootPage({Key? key}) : super(key: key);
 
   @override
-  State<rootPage> createState() => _rootPageState();
+  State<RootPage> createState() => _RootPageState();
 }
 
-class _rootPageState extends State<rootPage> {
+class _RootPageState extends State<RootPage> {
   int activeTab= 0;
 
   @override
@@ -84,7 +84,7 @@ class _rootPageState extends State<rootPage> {
     return IndexedStack(
       index: activeTab,
       children: [
-        homePage(),
+        HomePage(),
         Center(
             child: Text('Search', style: TextStyle(fontSize: 20, color: Color.fromRGBO(50, 0, 100, 1)))
         ),

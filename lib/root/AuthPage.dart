@@ -1,19 +1,19 @@
 import 'dart:convert';
-import 'package:fictune_frontend/root/rootPage.dart';
+import 'package:fictune_frontend/root/RootPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../network/networkHandler.dart';
+import '../network/NetworkHandler.dart';
 
 //auth page constructor
-class authPage extends StatefulWidget {
-  const authPage({Key? key}) : super(key: key);
+class AuthPage extends StatefulWidget {
+  const AuthPage({Key? key}) : super(key: key);
 
   @override
-  State<authPage> createState() => _authPageState();
+  State<AuthPage> createState() => _AuthPageState();
 }
 
 //auth page state
-class _authPageState extends State<authPage> {
+class _AuthPageState extends State<AuthPage> {
   final List<Widget> loadingWidgetArray= [
     const Text('Login', style: TextStyle(fontSize: 20, color: Colors.white)),
     const SizedBox(height: 30, width: 30, child: CircularProgressIndicator(backgroundColor: Colors.white))
@@ -131,7 +131,7 @@ class _authPageState extends State<authPage> {
                 ScaffoldMessenger.of(context).showSnackBar(snackBarWidget(message));
               } else {
                 setState(() {loadingState= 0;});
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> rootPage()));
+                Navigator.push(context, MaterialPageRoute(builder: (context)=> RootPage()));
               }
             } else {
               setState(() {loadingState= 0;});
