@@ -17,12 +17,14 @@ class _MainPageViewState extends State<MainPageView> {
       child: PageView.builder(
         itemCount: 5,
         itemBuilder: (context, position) {
-          return _buildPageItem(position);
+          return buildPageItem(position);
         }
       )
     );
   }
-  Widget _buildPageItem(int index) {
+
+  //Build page item widget
+  Widget buildPageItem(int index) {
     return GestureDetector(
       onTap: () {
         //just do nothing for a while
