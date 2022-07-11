@@ -90,7 +90,7 @@ class _AuthPageState extends State<AuthPage> {
   Widget inputTextField(String string, controller) {
     return(
         Container(
-          margin: EdgeInsets.only(left: 30, top: 25, right: 30, bottom: 0),
+          margin: const EdgeInsets.only(left: 30, top: 25, right: 30, bottom: 0),
           height: 28,
           child: TextField(
               controller: controller,
@@ -133,7 +133,6 @@ class _AuthPageState extends State<AuthPage> {
             String typedEmail= emailController.text;
             String typedPassword= passwordController.text;
             var response= await NetworkHandler().login('login', {'email': typedEmail, 'password': typedPassword});
-            print(response);
             if (response!=null) {
               List<String> responseList= response.split("%");
               if (responseList[0]!= 'success') {
@@ -150,13 +149,13 @@ class _AuthPageState extends State<AuthPage> {
           },
           child: Center(
               child: Padding(
-                  padding: EdgeInsets.only(top: 40),
+                  padding: const EdgeInsets.only(top: 40),
                   child: Container(
                       height: 40,
-                      margin: EdgeInsets.only(top: 10),
-                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Color.fromRGBO(50, 0, 100, 1)),
+                      margin: const EdgeInsets.only(top: 10),
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: const Color.fromRGBO(50, 0, 100, 1)),
                       width: 90,
-                      padding: EdgeInsets.only(bottom: 3),
+                      padding: const EdgeInsets.only(bottom: 3),
                       child: Center(
                           child: loadingWidgetArray[loadingState],
                       )

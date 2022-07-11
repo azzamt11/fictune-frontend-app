@@ -13,7 +13,7 @@ class _MainPageViewState extends State<MainPageView> {
   Widget build(BuildContext context) {
     var size= MediaQuery.of(context).size;
     return SizedBox(
-      height: 380,
+      height: size.height*0.46,
       child: PageView.builder(
         itemCount: 5,
         itemBuilder: (context, position) {
@@ -31,7 +31,12 @@ class _MainPageViewState extends State<MainPageView> {
       },
       child: Container(
         height: 380,
-        decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/fictuneBackground1.jpg"), fit: BoxFit.cover,)),
+        decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/images/fictuneBackground1.jpg"),
+              fit: BoxFit.cover,
+            )
+        ),
       )
     );
   }

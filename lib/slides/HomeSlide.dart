@@ -1,7 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../components/MainPageView.dart';
-import '../components/novelCard.dart';
+import '../components/NovelCard.dart';
 import '../helper/AppFunctions.dart';
 import '../helper/AppTheme.dart';
 
@@ -20,39 +21,68 @@ class _HomeSlideState extends State<HomeSlide> {
   @override
   Widget build(BuildContext context) {
     var size= MediaQuery.of(context).size;
-    String userName= widget.responseList[2];
     String userImage= widget.responseList[4];
+    String userUserData= widget.responseList[5];
+    String userBillingData= widget.responseList[6];
+    String coin= userBillingData.split('*')[0];
+    String userUserName= userUserData.split('*')[0];
     return CustomScrollView(
       slivers: [
         SliverAppBar(
           elevation: 0,
           pinned: true,
           backgroundColor: Colors.white,
-          actions: [
-            Container(
-                height: 70,
-                width: 150,
-                padding: const EdgeInsets.only(right: 10),
-                child: Center(
-                    child: Text(
-                        userName.toLowerCase().replaceAll(RegExp(' '), '_'),
-                        style: TextStyle(
-                            color: AppTheme.themeColor,
-                            fontSize: 20,
-                            overflow: TextOverflow.ellipsis)
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  SizedBox(
+                    height: 70,
+                    width: 100,
+                    child: Row(
+                        children: [
+                          const ImageIcon(AssetImage('assets/images/coinImage.jpg') , size: 20),
+                          Padding(
+                              padding: const EdgeInsets.only(left: 10) ,
+                              child: Text(coin, style: TextStyle(fontSize: 17, color: AppTheme.themeColor))
+                          ),
+                        ]
+                    ),
+                  ),
+                  SizedBox(
+                    child: Row(
+                      children: [
+                        Container(
+                            height: 70,
+                            width: 150,
+                            padding: const EdgeInsets.only(right: 10),
+                            child: Center(
+                                child: Text(
+                                    userUserName,
+                                    style: TextStyle(
+                                        color: AppTheme.themeColor,
+                                        fontSize: 20,
+                                        overflow: TextOverflow.ellipsis)
+                                )
+                            )
+                        ),
+                        Container(
+                            padding: const EdgeInsets.only(right: 15),
+                            height: 70,
+                            child: Center(
+                                child: CircleAvatar(
+                                    backgroundImage: MemoryImage(AppFunctions().convertBase64Image(userImage)),
+                                    radius: 25)
+                            )
+                        ),
+                      ]
                     )
-                )
-            ),
-            Container(
-                padding: const EdgeInsets.only(right: 15),
-                height: 70,
-                child: Center(
-                    child: CircleAvatar(
-                        backgroundImage: MemoryImage(AppFunctions().convertBase64Image(userImage)),
-                        radius: 25)
-                )
-            ),
-          ],
+                  ),
+                ],
+              ),
+            ]
+          ),
           expandedHeight: size.height*0.46,
           flexibleSpace: const FlexibleSpaceBar(
             background: MainPageView(),

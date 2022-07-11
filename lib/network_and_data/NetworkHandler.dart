@@ -104,6 +104,7 @@ class NetworkHandler {
 
   //login function
   Future<String?> login(String url, Map<String, String> body) async {
+    String nodata= RawImageFiles().nodata();
     try {
       var response = await http.post(Uri.parse("http://ftunebackend.herokuapp.com/api/login"),
           headers: {
@@ -113,26 +114,26 @@ class NetworkHandler {
           body: json.encode(body));
       var decodedResponse= json.decode(response.body);
       if (decodedResponse['user']!=null) {
-        saveString('user', 'token', decodedResponse['token'].toString());
-        saveString('user', 'user_name', decodedResponse['user']['name'].toString());
-        saveString('user', 'user_id', decodedResponse['user']['id'].toString());
-        saveString('user', 'user_email', decodedResponse['user']['email'].toString());
-        saveString('user', 'user_attribute', decodedResponse['user']['user_attribute_1'].toString());
-        saveString('user', 'user_pref', decodedResponse['user']['user_attribute_2'].toString());
-        saveString('user', 'user_username', decodedResponse['user']['user_attribute_3'].toString());
         String response1= decodedResponse['token'].toString();
         String response2= decodedResponse['user']['name'].toString();
         String response3= decodedResponse['user']['id'].toString();
         String response4= decodedResponse['user']['user_attribute_1'].toString();
-        return "success%$response1%$response2%$response3%$response4";
+        String response5= decodedResponse['user']['user_attribute_3'].toString();
+        String response6= decodedResponse['user']['user_attribute_4'].toString();
+        saveString('user', 'token', response1);
+        saveString('user', 'user_name', response2);
+        saveString('user', 'user_id', response3);
+        saveString('user', 'user_attribute', response4);
+        saveString('user', 'user_userdata', response5);
+        saveString('user', 'user_userbillingdata', response6);
+        return "success%$response1%$response2%$response3%$response4%$response5%$response6";
       } else if (decodedResponse['message']!=null) {
-        return "error%email or password is incorrect";
+        return "error%email or password is incorrect%unknown_user%0%$nodata%no_userdata%no_userbillingdata";
       } else {
-        return "error%something went wrong";
+        return "error%no_token%unknown_user%0%$nodata%no_userdata%no_userbillingdata";
       }
     } catch(e) {
-      print(e);
-      return "error%something went wrong";
+      return "error%something went wrong*$e%unknown_user%0%$nodata%no_userdata%no_userbillingdata";
     }//updated
   }
 
