@@ -46,7 +46,6 @@ class NetworkHandler {
 
   //get post by id function
   Future getPostById(String index, String token) async{
-    print('get post by id $index : $token');
     try {
       var response = await http.get(Uri.parse("http://ftunebackend.herokuapp.com/api/posts/$index"),
           headers: {
@@ -54,12 +53,10 @@ class NetworkHandler {
             "Authorization": "Bearer $token"
           });
       var decodedResponse= json.decode(response.body);
-      print('decodedResponse: $decodedResponse at network handler');
       if (decodedResponse['post']!=null) {
         String response1= decodedResponse['post'][0]['post_body'].toString();
         String response2= decodedResponse['post'][0]['post_attribute_3'].toString();
         String response= '$response1%$response2';
-        print(decodedResponse);
         saveString('user', "post_$index", response);
         return "success%$response";
       }
