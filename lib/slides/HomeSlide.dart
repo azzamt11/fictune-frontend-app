@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 
 import '../components/MainPageView.dart';
 import '../components/novelCard.dart';
 import '../helper/AppFunctions.dart';
 import '../helper/AppTheme.dart';
-import '../network_and_data/DataProvider.dart';
 
 //home page constructor
 class HomeSlide extends StatefulWidget {

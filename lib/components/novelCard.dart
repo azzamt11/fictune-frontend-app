@@ -1,11 +1,9 @@
 import 'dart:typed_data';
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../helper/AppFunctions.dart';
 import '../helper/AppTheme.dart';
-
 import '../network_and_data/NetworkHandler.dart';
 
 class NovelCard extends StatefulWidget {
