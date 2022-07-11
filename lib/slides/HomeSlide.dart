@@ -34,7 +34,7 @@ class _HomeSlideState extends State<HomeSlide> {
             Container(
                 height: 70,
                 width: 150,
-                padding: EdgeInsets.only(right: 10),
+                padding: const EdgeInsets.only(right: 10),
                 child: Center(
                     child: Text(
                         userName.toLowerCase().replaceAll(RegExp(' '), '_'),
@@ -46,7 +46,7 @@ class _HomeSlideState extends State<HomeSlide> {
                 )
             ),
             Container(
-                padding: EdgeInsets.only(right: 15),
+                padding: const EdgeInsets.only(right: 15),
                 height: 70,
                 child: Center(
                     child: CircleAvatar(
@@ -55,8 +55,8 @@ class _HomeSlideState extends State<HomeSlide> {
                 )
             ),
           ],
-          expandedHeight: size.height*0.5,
-          flexibleSpace: FlexibleSpaceBar(
+          expandedHeight: size.height*0.46,
+          flexibleSpace: const FlexibleSpaceBar(
             background: MainPageView(),
           ),
         ),
@@ -65,95 +65,17 @@ class _HomeSlideState extends State<HomeSlide> {
             padding: const EdgeInsets.all(5),
             child: ClipRRect(
               child: Container(
-                margin: EdgeInsets.only(top: 0),
-                height: 1000,
+                margin: const EdgeInsets.only(top: 0),
+                height: 1320,
                 color: Colors.white,
                 child: Column(
                   children: [
-                    Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 15, top: 15, bottom: 15),
-                            child: genreText('New Arrivals'),
-                          ),
-                          Container(
-                            height: 1,
-                            width: size.width*0.8,
-                            color: AppTheme.themeColor,
-                            margin: const EdgeInsets.only(left: 15, bottom: 15),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(left: 15, right: 15),
-                            child: Container(
-                              height: 150,
-                              width: size.width,
-                              child: ListView.separated(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: 10,
-                                separatorBuilder: (context, _)=> SizedBox(width: 10),
-                                itemBuilder: (context, index)=> _buildCard(widget.responseList, 0, index),
-                              ),
-                            ),
-                          )
-                        ]
-                    ),
-                    Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(left: 15, top: 15, bottom: 15),
-                            child: genreText('Romance'),
-                          ),
-                          Container(
-                            height: 1,
-                            width: size.width*0.8,
-                            color: AppTheme.themeColor,
-                            margin: EdgeInsets.only(left: 15, bottom: 15),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(left: 15, right: 15),
-                            child: Container(
-                              height: 150,
-                              width: size.width,
-                              child: ListView.separated(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: 10,
-                                separatorBuilder: (context, _)=> const SizedBox(width: 10),
-                                itemBuilder: (context, index)=> _buildCard(widget.responseList, 1, index),
-                              ),
-                            ),
-                          )
-                        ]
-                    ),
-                    Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(left: 15, top: 15, bottom: 15),
-                            child: genreText('Psychological'),
-                          ),
-                          Container(
-                            height: 1,
-                            width: size.width*0.8,
-                            color: Color.fromRGBO(50, 0, 100, 1),
-                            margin: EdgeInsets.only(left: 15, bottom: 15),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(left: 15, right: 15),
-                            child: Container(
-                              height: 150,
-                              width: size.width,
-                              child: ListView.separated(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: 10,
-                                separatorBuilder: (context, _)=> SizedBox(width: 10),
-                                itemBuilder: (context, index)=> _buildCard(widget.responseList, 2, index),
-                              ),
-                            ),
-                          )
-                        ]
-                    ),
+                    novelCard('New Arrivals', 0),
+                    novelCard('Romance', 1),
+                    novelCard('Family', 2),
+                    novelCard('Fantasy', 3),
+                    novelCard('Science-Fiction', 4),
+                    novelCard('Psychological', 5),
                   ]
                 )
               )
@@ -166,10 +88,9 @@ class _HomeSlideState extends State<HomeSlide> {
 
   //widgets and functions:
   //novel card
-  Widget _buildCard(List<String> responseList, int genre, int index) {
+  Widget buildCard(List<String> responseList, int genre, int index) {
     String token= responseList[1];
     String userId= responseList[3];
-    print('user id: $userId, user token: $token, genre: $genre, index: $index  at build card (HomePage)');
     return GestureDetector(
         onTap: () {
           //just do nothing for a while
@@ -178,14 +99,37 @@ class _HomeSlideState extends State<HomeSlide> {
     );
   }
 
-  //user preference novel image function
-  Future<String> userPrefNovelImageCode() async {
-    final userPrefList= await DataProvider().getString('user', 'user_pref');
-    if (userPrefList!=null) {
-      return userPrefList;
-    } else {
-      return '0';
-    }
+  //novel card widget
+  Widget novelCard(String genreName, int genre) {
+    var size= MediaQuery.of(context).size;
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 15, top: 15, bottom: 15),
+            child: genreText(genreName),
+          ),
+          Container(
+            height: 1,
+            width: size.width*0.8,
+            color: const Color.fromRGBO(50, 0, 100, 1),
+            margin: const EdgeInsets.only(left: 15, bottom: 15),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 15, right: 15),
+            child: Container(
+              height: 150,
+              width: size.width,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: 10,
+                separatorBuilder: (context, _)=> const SizedBox(width: 10),
+                itemBuilder: (context, index)=> buildCard(widget.responseList, genre, index),
+              ),
+            ),
+          )
+        ]
+    );
   }
 
   //genre text

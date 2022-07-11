@@ -11,51 +11,37 @@ class NetworkHandler {
     return '$userId/$key';
   }
 
-  //get user preference by attribute function
-  Future getUserPref(String attributeIndex) async {
-    var token= getString('user', 'token');
-    var response = await http.get(Uri.parse("http://ftunebackend.herokuapp.com/api/user"),
-        headers: {
-          "Content-type": "application/json",
-          "Authorization": "Bearer $token"
-        });
-    var decodedResponse= json.decode(response.body);
-    try {
-      if (decodedResponse['user']!=null) {
-        String userPref= decodedResponse['user']['user_attribute_4'].toString();
-        String userPrefGenre= userPref.split('%')[int.parse(attributeIndex)];
-        saveString('user', 'user_userpref_genre_$attributeIndex', userPrefGenre);
-        return "success%$userPrefGenre";
-      }
-    } catch(e) {
-      print(decodedResponse);
-      return "error%1 2 1 2 1 2 1 2 1 2";
-    }
-  }
-
   Future getLatestPostsByGenre(String genre, String index, String token) async{
     int genreInt= int.parse(genre);
     int indexInt= int.parse(index);
     indexInt++;
-    var response = await http.get(
-        Uri.parse('http://ftunebackend.herokuapp.com/api/posts/attribute/$genreInt/index/$indexInt'),
-        headers: {
-          "Content-type": "application/json",
-          "Authorization": "Bearer $token"
-        }
-    );
-    var decodedResponse= json.decode(response.body);
-    var responseString= response.toString();
-    print(responseString);
+    var headers= {
+      "Content-type": "application/json",
+      "Authorization": "Bearer $token"
+    };
+    String nodata= RawImageFiles().nodata();
+    http.Response response;
     try {
+      if (genreInt==0) {
+        response = await http.get(
+            Uri.parse('http://ftunebackend.herokuapp.com/api/posts/index/$indexInt'),
+            headers: headers,
+        );
+      } else {
+        response = await http.get(
+            Uri.parse('http://ftunebackend.herokuapp.com/api/posts/attribute/$genreInt/index/$indexInt'),
+            headers: headers,
+        );
+      }
+      var decodedResponse= json.decode(response.body);
       var title= decodedResponse['posts']['post_body'].toString();
       var image= decodedResponse['posts']['post_attribute_3'].toString();
       return 'success%$title%$image';
     } catch(e) {
       print(e);
-      String nodata= RawImageFiles().nodata();
-      return 'error%nodata%$nodata';
+      return 'error%$e%$nodata';
     }
+
   }
 
   //get post by id function
@@ -78,7 +64,6 @@ class NetworkHandler {
         return "success%$response";
       }
     } catch(e) {
-      print('fetching error $e');
       return "error%something went wrong";
     }
   }
