@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:fictune_frontend/Files/RawImageFiles.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,42 +14,71 @@ class NetworkHandler {
   //get user preference by attribute function
   Future getUserPref(String attributeIndex) async {
     var token= getString('user', 'token');
+    var response = await http.get(Uri.parse("http://ftunebackend.herokuapp.com/api/user"),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer $token"
+        });
+    var decodedResponse= json.decode(response.body);
     try {
-      var response = await http.post(Uri.parse("http://ftunebackend.herokuapp.com/api/user"),
-          headers: {
-            "Content-type": "application/json",
-            "Authorization": "Bearer $token"
-          });
-      var decodedResponse= json.decode(response.body);
       if (decodedResponse['user']!=null) {
         String userPref= decodedResponse['user']['user_attribute_4'].toString();
-        List<String> userPrefGenre= userPref.split('%');
-        saveString('user', 'user_userpref_genre_$attributeIndex', userPrefGenre[int.parse(attributeIndex)]);
-        return "success%$userPref";
+        String userPrefGenre= userPref.split('%')[int.parse(attributeIndex)];
+        saveString('user', 'user_userpref_genre_$attributeIndex', userPrefGenre);
+        return "success%$userPrefGenre";
       }
     } catch(e) {
-      return "error%something went wrong";
+      print(decodedResponse);
+      return "error%1 2 1 2 1 2 1 2 1 2";
+    }
+  }
+
+  Future getLatestPostsByGenre(String genre, String index, String token) async{
+    int genreInt= int.parse(genre);
+    int indexInt= int.parse(index);
+    indexInt++;
+    var response = await http.get(
+        Uri.parse('http://ftunebackend.herokuapp.com/api/posts/attribute/$genreInt/index/$indexInt'),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer $token"
+        }
+    );
+    var decodedResponse= json.decode(response.body);
+    var responseString= response.toString();
+    print(responseString);
+    try {
+      var title= decodedResponse['posts']['post_body'].toString();
+      var image= decodedResponse['posts']['post_attribute_3'].toString();
+      return 'success%$title%$image';
+    } catch(e) {
+      print(e);
+      String nodata= RawImageFiles().nodata();
+      return 'error%nodata%$nodata';
     }
   }
 
   //get post by id function
-  Future getPostById(int index) async{
-    var token= getString('user', 'token');
+  Future getPostById(String index, String token) async{
+    print('get post by id $index : $token');
     try {
-      var response = await http.post(Uri.parse("http://ftunebackend.herokuapp.com/api/posts/$index"),
+      var response = await http.get(Uri.parse("http://ftunebackend.herokuapp.com/api/posts/$index"),
           headers: {
             "Content-type": "application/json",
             "Authorization": "Bearer $token"
           });
       var decodedResponse= json.decode(response.body);
+      print('decodedResponse: $decodedResponse at network handler');
       if (decodedResponse['post']!=null) {
-        saveString('user', 'post_body', decodedResponse['post']['post_body'].toString());
-        saveString('user', 'post_image', decodedResponse['post']['post_attribute_3'].toString());
-        String response1= decodedResponse['post']['post_body'].toString();
-        String response2= decodedResponse['post']['post_attribute_3'].toString();
-        return "success%$response1%$response2";
+        String response1= decodedResponse['post'][0]['post_body'].toString();
+        String response2= decodedResponse['post'][0]['post_attribute_3'].toString();
+        String response= '$response1%$response2';
+        print(decodedResponse);
+        saveString('user', "post_$index", response);
+        return "success%$response";
       }
     } catch(e) {
+      print('fetching error $e');
       return "error%something went wrong";
     }
   }
@@ -108,15 +138,19 @@ class NetworkHandler {
         saveString('user', 'user_attribute', decodedResponse['user']['user_attribute_1'].toString());
         saveString('user', 'user_pref', decodedResponse['user']['user_attribute_2'].toString());
         saveString('user', 'user_username', decodedResponse['user']['user_attribute_3'].toString());
-        String response1= decodedResponse['token'];
-        String response2= decodedResponse['user']['name'];
-        return "success%$response2%$response1";
+        String response1= decodedResponse['token'].toString();
+        String response2= decodedResponse['user']['name'].toString();
+        String response3= decodedResponse['user']['id'].toString();
+        String response4= decodedResponse['user']['user_attribute_1'].toString();
+        return "success%$response1%$response2%$response3%$response4";
       } else if (decodedResponse['message']!=null) {
         return "error%email or password is incorrect";
       } else {
+        print(decodedResponse);
         return "error%something went wrong";
       }
     } catch(e) {
+      print(e);
       return "error%something went wrong";
     }//updated
   }

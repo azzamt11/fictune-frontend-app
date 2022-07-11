@@ -1,8 +1,8 @@
-import 'dart:convert';
-import 'package:fictune_frontend/root/RootPage.dart';
+import 'package:fictune_frontend/pages/RootPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../network/NetworkHandler.dart';
+
+import '../network_and_data/NetworkHandler.dart';
 
 //auth page constructor
 class AuthPage extends StatefulWidget {
@@ -59,7 +59,7 @@ class _AuthPageState extends State<AuthPage> {
                   decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
                   child: Column(
                       children: [
-                        tittle(),
+                        title(),
                         inputTextField('email', emailController),
                         purpleLine(),
                         inputTextField('password', passwordController),
@@ -77,7 +77,7 @@ class _AuthPageState extends State<AuthPage> {
 
   //components:
   //tittle widget
-  Widget tittle() {
+  Widget title() {
     return(
         const Padding(
             padding: EdgeInsets.only(top: 20, bottom: 30),
@@ -95,7 +95,17 @@ class _AuthPageState extends State<AuthPage> {
           child: TextField(
               controller: controller,
               style: const TextStyle(fontSize: 18),
-              decoration: InputDecoration(contentPadding: EdgeInsets.zero, isDense: true, hintStyle: TextStyle(color: Theme.of(context).hintColor, fontSize: 18),border: InputBorder.none, focusedBorder: InputBorder.none, enabledBorder: InputBorder.none, errorBorder: InputBorder.none, disabledBorder: InputBorder.none, hintText: string)
+              decoration: InputDecoration(
+                  contentPadding: EdgeInsets.zero,
+                  isDense: true,
+                  hintStyle: TextStyle(color: Theme.of(context).hintColor, fontSize: 18),
+                  border: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  disabledBorder: InputBorder.none,
+                  hintText: string
+              )
           ),
         )
     );
@@ -123,15 +133,15 @@ class _AuthPageState extends State<AuthPage> {
             String typedEmail= emailController.text;
             String typedPassword= passwordController.text;
             var response= await NetworkHandler().login('login', {'email': typedEmail, 'password': typedPassword});
+            print(response);
             if (response!=null) {
               List<String> responseList= response.split("%");
-              print(responseList);
               if (responseList[0]!= 'success') {
-                setState(() {message= responseList[1];loadingState= 0;});
+                setState(() {message= 'email or password is incorrect'; loadingState= 0;});
                 ScaffoldMessenger.of(context).showSnackBar(snackBarWidget(message));
               } else {
                 setState(() {loadingState= 0;});
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> RootPage()));
+                Navigator.push(context, MaterialPageRoute(builder: (context)=> RootPage(responseList: responseList)));
               }
             } else {
               setState(() {loadingState= 0;});

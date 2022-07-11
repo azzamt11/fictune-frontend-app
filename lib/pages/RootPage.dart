@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../pages/HomePage.dart';
+
+import '../slides/HomeSlide.dart';
 
 class RootPage extends StatefulWidget {
-  const RootPage({Key? key}) : super(key: key);
+  final List<String> responseList;
+  const RootPage({Key? key, required this.responseList}) : super(key: key);
 
   @override
   State<RootPage> createState() => _RootPageState();
@@ -84,7 +86,7 @@ class _RootPageState extends State<RootPage> {
     return IndexedStack(
       index: activeTab,
       children: [
-        HomePage(),
+        HomeSlide(responseList: widget.responseList),
         Center(
             child: Text('Search', style: TextStyle(fontSize: 20, color: Color.fromRGBO(50, 0, 100, 1)))
         ),
