@@ -26,62 +26,62 @@ class _HomeSlideState extends State<HomeSlide> {
     String userBillingData= widget.responseList[6];
     String coin= userBillingData.split('*')[0];
     String userUserName= userUserData.split('*')[0];
+    var themeColor= AppTheme.themeColor;
     return CustomScrollView(
       slivers: [
         SliverAppBar(
           elevation: 0,
           pinned: true,
           backgroundColor: Colors.white,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  SizedBox(
-                    height: 70,
-                    width: 100,
-                    child: Row(
-                        children: [
-                          const ImageIcon(AssetImage('assets/images/coinImage.jpg') , size: 20),
-                          Padding(
-                              padding: const EdgeInsets.only(left: 10) ,
-                              child: Text(coin, style: TextStyle(fontSize: 17, color: AppTheme.themeColor))
-                          ),
-                        ]
+          actions: [
+            Container(
+                height: 70,
+                width: size.width*0.42,
+                padding: const EdgeInsets.only(right: 10),
+                child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                        userUserName,
+                        style: TextStyle(
+                            color: AppTheme.themeColor,
+                            fontSize: 20,
+                            overflow: TextOverflow.ellipsis)
+                    )
+                )
+            ),
+            Container(
+                padding: const EdgeInsets.only(right: 16),
+                height: 70,
+                child: Center(
+                    child: CircleAvatar(
+                        backgroundImage: MemoryImage(AppFunctions().convertBase64Image(userImage)),
+                        radius: 25)
+                )
+            ),
+          ],
+          leadingWidth: size.width*0.46,
+          leading: Container(
+            height: 70,
+            child: Row(
+              children: [
+                Container(
+                  height: 70,
+                  width: 51,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      decoration: const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/coin.jpg'))),
+                      height: 35,
+                      width: 35,
                     ),
                   ),
-                  SizedBox(
-                    child: Row(
-                      children: [
-                        Container(
-                            height: 70,
-                            width: 150,
-                            padding: const EdgeInsets.only(right: 10),
-                            child: Center(
-                                child: Text(
-                                    userUserName,
-                                    style: TextStyle(
-                                        color: AppTheme.themeColor,
-                                        fontSize: 20,
-                                        overflow: TextOverflow.ellipsis)
-                                )
-                            )
-                        ),
-                        Container(
-                            padding: const EdgeInsets.only(right: 15),
-                            height: 70,
-                            child: Center(
-                                child: CircleAvatar(
-                                    backgroundImage: MemoryImage(AppFunctions().convertBase64Image(userImage)),
-                                    radius: 25)
-                            )
-                        ),
-                      ]
-                    )
-                  ),
-                ],
-              ),
-            ]
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(padding: EdgeInsets.only(left: 8), child: Text(coin, style: TextStyle(fontSize: 20, color: themeColor)))
+                ),
+              ]
+            )
           ),
           expandedHeight: size.height*0.46,
           flexibleSpace: const FlexibleSpaceBar(

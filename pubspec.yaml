@@ -67,7 +67,7 @@ flutter:
     - assets/images/fictuneBackground1.jpg
     - assets/images/fictuneBackground2.PNG
     - assets/images/noimage.PNG
-    - assets/images/coinImage.jpg
+    - assets/images/coin.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
