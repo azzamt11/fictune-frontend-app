@@ -128,7 +128,6 @@ class NetworkHandler {
       } else if (decodedResponse['message']!=null) {
         return "error%email or password is incorrect";
       } else {
-        print(decodedResponse);
         return "error%something went wrong";
       }
     } catch(e) {
