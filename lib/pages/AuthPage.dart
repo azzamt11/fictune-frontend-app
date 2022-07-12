@@ -93,9 +93,7 @@ class _AuthPageState extends State<AuthPage> {
                                 children: [
                                   const Text("Don't have account?", style: TextStyle(fontSize: 18, color: Colors.white)),
                                   GestureDetector(
-                                    onTap: () {
-                                      //just do nothing for a while
-                                    },
+                                    onTap: registerFunction(),
                                     child: Container(
                                         height: 40,
                                         decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: const Color.fromRGBO(50, 0, 100, 1)),
@@ -225,6 +223,7 @@ class _AuthPageState extends State<AuthPage> {
     return snackBar;
   }
 
+  //login with other method widget
   Widget loginWithOtherMethod() {
     return Column(
       children: [
@@ -238,9 +237,7 @@ class _AuthPageState extends State<AuthPage> {
           child: Row(
               children: [
                 GestureDetector(
-                  onTap: () {
-                    //just do nothing for a while
-                  },
+                  onTap: googleLoginFunction(),
                   child: const CircleAvatar(
                     backgroundImage: AssetImage('assets/images/google.png'),
                     radius: 20,
@@ -248,9 +245,7 @@ class _AuthPageState extends State<AuthPage> {
                 ),
                 const SizedBox(width: 12),
                 GestureDetector(
-                  onTap: () {
-                    //just do nothing for a while
-                  },
+                  onTap: facebookLoginFunction(),
                   child: const CircleAvatar(
                     backgroundImage: AssetImage('assets/images/facebook.PNG'),
                     radius: 20,
@@ -261,5 +256,20 @@ class _AuthPageState extends State<AuthPage> {
         ),
       ],
     );
+  }
+
+  //google login function
+  googleLoginFunction() {
+    //just do nothing for a while
+  }
+
+  //facebook login function
+  facebookLoginFunction() {
+    //just do nothing for a while
+  }
+
+  //register function
+  registerFunction() {
+    //just do nothing for a while
   }
 }
