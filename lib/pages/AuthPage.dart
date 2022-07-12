@@ -1,7 +1,8 @@
+import 'dart:math';
 import 'package:fictune_frontend/pages/RootPage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../helper/AppTheme.dart';
 import '../network_and_data/NetworkHandler.dart';
 
 //auth page constructor
@@ -14,11 +15,16 @@ class AuthPage extends StatefulWidget {
 
 //auth page state
 class _AuthPageState extends State<AuthPage> {
-  final List<Widget> loadingWidgetArray= [
+  final List<Widget> loginLoadingWidgetArray= [
     const Text('Login', style: TextStyle(fontSize: 20, color: Colors.white)),
     const SizedBox(height: 30, width: 30, child: CircularProgressIndicator(backgroundColor: Colors.white))
   ];
-  var loadingState= 0;
+  final List<Widget> registerLoadingWidgetArray =[
+    const Text('Register', style: TextStyle(fontSize: 20, color: Colors.white)),
+    const SizedBox(height: 30, width: 30, child: CircularProgressIndicator(backgroundColor: Colors.white))
+  ];
+  var loginLoadingState= 0;
+  var registerLoadingState= 0;
   var message= 'something went wrong';
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
@@ -53,20 +59,53 @@ class _AuthPageState extends State<AuthPage> {
             width: size.width,
             color: Colors.black54,
             child: Center(
-              child: Container(
-                  height: 350,
-                  width: 310,
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
-                  child: Column(
-                      children: [
-                        title(),
-                        inputTextField('email', emailController),
-                        purpleLine(),
-                        inputTextField('password', passwordController),
-                        purpleLine(),
-                        button()
-                      ]
-                  )
+              child: SizedBox(
+                height: 430,
+                width: size.width,
+                child: Column(
+                  children: [
+                    Container(
+                        height: 360,
+                        width: min(310, size.width*0.76),
+                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              title(),
+                              inputTextField('email', emailController),
+                              purpleLine(),
+                              inputTextField('password', passwordController),
+                              purpleLine(),
+                              button(),
+                              loginWithOtherMethod()
+
+                            ]
+                        )
+                    ),
+                    SizedBox(
+                        height: 50,
+                        width: 310,
+                        child: Center(
+                            child: SizedBox(
+                              width: 256,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text("Don't have account?", style: TextStyle(fontSize: 18, color: Colors.white)),
+                                  Container(
+                                      height: 40,
+                                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: const Color.fromRGBO(50, 0, 100, 1)),
+                                      width: 90,
+                                      child: Center(
+                                        child: registerLoadingWidgetArray[registerLoadingState],
+                                      )
+                                  )
+                                ],
+                              ),
+                            ))
+                    )
+                  ]
+                ),
               ),
             ),
           ),
@@ -80,7 +119,7 @@ class _AuthPageState extends State<AuthPage> {
   Widget title() {
     return(
         const Padding(
-            padding: EdgeInsets.only(top: 20, bottom: 30),
+            padding: EdgeInsets.only(top: 20, bottom: 15),
             child: Text('Login to Fictune', style: TextStyle(fontSize: 24, color: Color.fromRGBO(50, 0, 100,1), fontWeight: FontWeight.bold))
         )
     );
@@ -113,10 +152,11 @@ class _AuthPageState extends State<AuthPage> {
 
   //line widget
   Widget purpleLine() {
+    var size= MediaQuery.of(context).size;
     return(
         Container(
             height: 1,
-            width: 246,
+            width: min(246, size.width*0.76 -64),
             color: const Color.fromRGBO(50, 0, 100, 1)
         )
     );
@@ -128,7 +168,7 @@ class _AuthPageState extends State<AuthPage> {
         GestureDetector(
           onTap: () async {
             setState(() {
-              loadingState= 1;
+              loginLoadingState= 1;
             });
             String typedEmail= emailController.text;
             String typedPassword= passwordController.text;
@@ -136,20 +176,20 @@ class _AuthPageState extends State<AuthPage> {
             if (response!=null) {
               List<String> responseList= response.split("%");
               if (responseList[0]!= 'success') {
-                setState(() {message= 'email or password is incorrect'; loadingState= 0;});
+                setState(() {message= 'email or password is incorrect'; loginLoadingState= 0;});
                 ScaffoldMessenger.of(context).showSnackBar(snackBarWidget(message));
               } else {
-                setState(() {loadingState= 0;});
+                setState(() {loginLoadingState= 0;});
                 Navigator.push(context, MaterialPageRoute(builder: (context)=> RootPage(responseList: responseList)));
               }
             } else {
-              setState(() {loadingState= 0;});
+              setState(() {loginLoadingState= 0;});
               ScaffoldMessenger.of(context).showSnackBar(snackBarWidget(message));
             }
           },
           child: Center(
               child: Padding(
-                  padding: const EdgeInsets.only(top: 40),
+                  padding: const EdgeInsets.only(top: 30),
                   child: Container(
                       height: 40,
                       margin: const EdgeInsets.only(top: 10),
@@ -157,7 +197,7 @@ class _AuthPageState extends State<AuthPage> {
                       width: 90,
                       padding: const EdgeInsets.only(bottom: 3),
                       child: Center(
-                          child: loadingWidgetArray[loadingState],
+                          child: loginLoadingWidgetArray[loginLoadingState],
                       )
                   )
               )
@@ -173,10 +213,38 @@ class _AuthPageState extends State<AuthPage> {
       action: SnackBarAction(
         label: 'Dismiss',
         onPressed: () {
-          setState(() {loadingState=0;});
+          setState(() {loginLoadingState=0;});
         },
       ),
     );
     return snackBar;
+  }
+
+  Widget loginWithOtherMethod() {
+    return Column(
+      children: [
+        const SizedBox(height: 15),
+        SizedBox(
+            height: 25,
+            child: Text("or login using google or facebook", style: TextStyle(fontSize: 15, color: AppTheme.themeColor))
+        ),
+        SizedBox(
+          width: 92,
+          child: Row(
+              children: const [
+                CircleAvatar(
+                  backgroundImage: AssetImage('assets/images/google.png'),
+                  radius: 20,
+                ),
+                SizedBox(width: 12),
+                CircleAvatar(
+                  backgroundImage: AssetImage('assets/images/facebook.PNG'),
+                  radius: 20,
+                )
+              ]
+          ),
+        ),
+      ],
+    );
   }
 }
