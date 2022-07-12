@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../components/MainPageView.dart';
@@ -60,11 +59,11 @@ class _HomeSlideState extends State<HomeSlide> {
             ),
           ],
           leadingWidth: size.width*0.46,
-          leading: Container(
+          leading: SizedBox(
             height: 70,
             child: Row(
               children: [
-                Container(
+                SizedBox(
                   height: 70,
                   width: 51,
                   child: Align(
@@ -78,7 +77,7 @@ class _HomeSlideState extends State<HomeSlide> {
                 ),
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Padding(padding: EdgeInsets.only(left: 8), child: Text(coin, style: TextStyle(fontSize: 20, color: themeColor)))
+                  child: Padding(padding: const EdgeInsets.only(left: 8), child: Text(coin, style: TextStyle(fontSize: 20, color: themeColor)))
                 ),
               ]
             )

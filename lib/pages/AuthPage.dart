@@ -92,13 +92,18 @@ class _AuthPageState extends State<AuthPage> {
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text("Don't have account?", style: TextStyle(fontSize: 18, color: Colors.white)),
-                                  Container(
-                                      height: 40,
-                                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: const Color.fromRGBO(50, 0, 100, 1)),
-                                      width: 90,
-                                      child: Center(
-                                        child: registerLoadingWidgetArray[registerLoadingState],
-                                      )
+                                  GestureDetector(
+                                    onTap: () {
+                                      //just do nothing for a while
+                                    },
+                                    child: Container(
+                                        height: 40,
+                                        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: const Color.fromRGBO(50, 0, 100, 1)),
+                                        width: 90,
+                                        child: Center(
+                                          child: registerLoadingWidgetArray[registerLoadingState],
+                                        )
+                                    ),
                                   )
                                 ],
                               ),
