@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../helper/AppTheme.dart';
 import '../network_and_data/NetworkHandler.dart';
+import 'RegisterPage.dart';
 
 //auth page constructor
 class AuthPage extends StatefulWidget {
@@ -260,16 +261,16 @@ class _AuthPageState extends State<AuthPage> {
 
   //google login function
   googleLoginFunction() {
-    //just do nothing for a while
+    //for 14 july 's work
   }
 
   //facebook login function
   facebookLoginFunction() {
-    //just do nothing for a while
+    //for 14 july 's work
   }
 
   //register function
   registerFunction() {
-    //just do nothing for a while
+    Navigator.push(context, MaterialPageRoute(builder: (context)=> const RegisterPage()));
   }
 }
