@@ -236,15 +236,25 @@ class _AuthPageState extends State<AuthPage> {
         SizedBox(
           width: 92,
           child: Row(
-              children: const [
-                CircleAvatar(
-                  backgroundImage: AssetImage('assets/images/google.png'),
-                  radius: 20,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    //just do nothing for a while
+                  },
+                  child: const CircleAvatar(
+                    backgroundImage: AssetImage('assets/images/google.png'),
+                    radius: 20,
+                  ),
                 ),
-                SizedBox(width: 12),
-                CircleAvatar(
-                  backgroundImage: AssetImage('assets/images/facebook.PNG'),
-                  radius: 20,
+                const SizedBox(width: 12),
+                GestureDetector(
+                  onTap: () {
+                    //just do nothing for a while
+                  },
+                  child: const CircleAvatar(
+                    backgroundImage: AssetImage('assets/images/facebook.PNG'),
+                    radius: 20,
+                  ),
                 )
               ]
           ),
