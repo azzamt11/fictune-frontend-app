@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../helper/AppFunctions.dart';
 import '../helper/AppTheme.dart';
 import '../network_and_data/NetworkHandler.dart';
 import 'AuthPage.dart';
@@ -38,7 +39,7 @@ class _InitialPageState extends State<InitialPage> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    navigateToRootOrLogin();
+    AppFunctions().navigateToRootOrLogin(context);
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
@@ -72,26 +73,5 @@ class _InitialPageState extends State<InitialPage> with SingleTickerProviderStat
       )
 
     );
-  }
-
-  Future<void> navigateToRootOrLogin() async{
-    String? token= await NetworkHandler().getString('user', 'token');
-    print(token);
-    if (token!=null) {
-      String? response1= await NetworkHandler().getString('user', 'token');
-      String? response2= await NetworkHandler().getString('user', 'user_name');
-      String? response3= await NetworkHandler().getString('user', 'user_id');
-      String? response4= await NetworkHandler().getString('user', 'user_attribute');
-      String? response5= await NetworkHandler().getString('user', 'user_userdata');
-      String? response6= await NetworkHandler().getString('user', 'user_userbillingdata');
-      if (response1!=null && response2!=null && response3!=null && response4!=null&& response5!=null && response6!=null) {
-        List<String> responseList= ['success', response1, response2, response3, response4, response5, response6];
-        Navigator.push(context, MaterialPageRoute(builder: (context)=> RootPage(responseList: responseList)));
-      } else {
-        Navigator.push(context, MaterialPageRoute(builder: (context)=> const AuthPage()));
-      }
-    } else {
-      Navigator.push(context, MaterialPageRoute(builder: (context)=> const AuthPage()));
-    }
   }
 }

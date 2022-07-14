@@ -28,14 +28,14 @@ class _NovelCardState extends State<NovelCard> {
     return Container(
       height: 150,
       width: 100,
-      color: Colors.grey,
+      color: const Color.fromRGBO(241, 241, 241, 1),
       child: activeWidget,
     );
   }
 
   Future<void> setNovelImage() async{
-    String novelDataString= await NetworkHandler().getLatestPostsByGenre(widget.genre, widget.index, widget.token);
-    final novelImage= novelDataString.split('%')[2];
+    List<String> novelDataArray= await NetworkHandler().getLatestPostsByGenre(widget.genre, widget.index, widget.token);
+    final novelImage= novelDataArray[2];
     setState(() {
       activeWidget= Container(
         height: 150,

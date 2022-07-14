@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../slides/HomeSlide.dart';
+import '../slides/MeSlide.dart';
 
 class RootPage extends StatefulWidget {
   final List<String> responseList;
@@ -90,9 +91,7 @@ class _RootPageState extends State<RootPage> {
         Center(
             child: Text('Search', style: TextStyle(fontSize: 20, color: Color.fromRGBO(50, 0, 100, 1)))
         ),
-        Center(
-            child: Text('Me', style: TextStyle(fontSize: 20, color: Color.fromRGBO(50, 0, 100, 1)))
-        )
+        MeSlide(responseList: widget.responseList),
       ],
     );
   }

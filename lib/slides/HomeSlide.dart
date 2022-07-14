@@ -54,7 +54,8 @@ class _HomeSlideState extends State<HomeSlide> {
                 child: Center(
                     child: CircleAvatar(
                         backgroundImage: MemoryImage(AppFunctions().convertBase64Image(userImage)),
-                        radius: 25)
+                        radius: 25
+                    )
                 )
             ),
           ],

@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:fictune_frontend/Files/RawImageFiles.dart';
+import 'package:fictune_frontend/files/RawImageFiles.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,7 +11,8 @@ class NetworkHandler {
     return '$userId/$key';
   }
 
-  Future getLatestPostsByGenre(String genre, String index, String token) async{
+  //get latest post by genre function
+  Future<List<String>> getLatestPostsByGenre(String genre, String index, String token) async{
     int genreInt= int.parse(genre);
     int indexInt= int.parse(index);
     indexInt++;
@@ -36,16 +37,15 @@ class NetworkHandler {
       var decodedResponse= json.decode(response.body);
       var title= decodedResponse['posts']['post_body'].toString();
       var image= decodedResponse['posts']['post_attribute_3'].toString();
-      return 'success%$title%$image';
+      return ['success', title, image];
     } catch(e) {
-      print(e);
-      return 'error%$e%$nodata';
+      return ['error', 'something went wrong : $e', nodata];
     }
 
   }
 
   //get post by id function
-  Future getPostById(String index, String token) async{
+  Future getSubPostByParentId(String index, String token) async{
     try {
       var response = await http.get(Uri.parse("http://ftunebackend.herokuapp.com/api/posts/$index"),
           headers: {
@@ -103,8 +103,8 @@ class NetworkHandler {
   }
 
   //login function
-  Future<String?> login(String url, Map<String, String> body) async {
-    String nodata= RawImageFiles().nodata();
+  Future<List<String>> login(String url, Map<String, String> body) async {
+    String zeroString= '000000';
     try {
       var response = await http.post(Uri.parse("http://ftunebackend.herokuapp.com/api/login"),
           headers: {
@@ -126,14 +126,57 @@ class NetworkHandler {
         saveString('user', 'user_attribute', response4);
         saveString('user', 'user_userdata', response5);
         saveString('user', 'user_userbillingdata', response6);
-        return "success%$response1%$response2%$response3%$response4%$response5%$response6";
+        if (response4== '') {
+          response4= RawImageFiles().userImage();
+        }
+        if (response5== '') {
+          String userNumber= zeroString.substring(1, 6- response3.length)+ response3;
+          response5= 'user$userNumber';
+        }
+        if (response6== '') {
+          response6= '2000';
+        }
+        return ['success', response1, response2, response3, response4, response5, response6];
       } else if (decodedResponse['message']!=null) {
-        return "error%email or password is incorrect%unknown_user%0%$nodata%no_userdata%no_userbillingdata";
+        return ['error', 'email or password is incorrect', 'unknown_user', '0', RawImageFiles().userImage(), 'no_userdata', 'no_userbillingdata'];
       } else {
-        return "error%no_token%unknown_user%0%$nodata%no_userdata%no_userbillingdata";
+        return ['error', 'email or password is incorrect' ,'unknown_user', '0', RawImageFiles().userImage(), 'no_userdata', 'no_userbillingdata'];
       }
     } catch(e) {
-      return "error%something went wrong*$e%unknown_user%0%$nodata%no_userdata%no_userbillingdata";
+      return ['error', 'something went wrong : $e' , 'unknown_user', '0', RawImageFiles().userImage(), 'no_userdata', 'no_userbillingdata'];
+    }//updated
+  }
+
+  //register function
+  Future<List<String>> register(String url, Map<String, String> body) async {
+    String zeroString= '000000';
+    try {
+      var response = await http.post(Uri.parse("http://ftunebackend.herokuapp.com/api/$url"),
+          headers: {
+            "Content-type": "application/json",
+            "Access-Control-Allow-Origin":"*"
+          },
+          body: json.encode(body));
+      var decodedResponse= json.decode(response.body);
+      if (decodedResponse['user']!=null) {
+        String response1= decodedResponse['token'].toString();
+        String response2= decodedResponse['user']['name'].toString();
+        String response3= decodedResponse['user']['id'].toString();
+        saveString('user', 'token', response1);
+        saveString('user', 'user_name', response2);
+        saveString('user', 'user_id', response3);
+        saveString('user', 'user_attribute', RawImageFiles().userImage());
+        String userNumber= zeroString.substring(1, 6- response3.length)+ response3;
+        saveString('user', 'user_userdata', 'user$userNumber*instagram*birthdate');
+        saveString('user', 'user_userbillingdata', '2000*nonpremium');
+        return ['success', response1, response2, response3, RawImageFiles().userImage(), 'user$userNumber', '2000'];
+      } else if (decodedResponse['message']!=null){
+        return ['error', decodedResponse['message'], 'unknown_user', '0', RawImageFiles().userImage(), 'no_data', 'no_data'];
+      } else {
+        return ['error', 'something went wrong' ,'unknown_user', '0', RawImageFiles().userImage(), 'no_data', 'no_data'];
+      }
+    } catch(e) {
+      return ['error', 'something went wrong : $e' , 'unknown_user', '0', RawImageFiles().userImage(), 'no_data', 'no_data'];
     }//updated
   }
 

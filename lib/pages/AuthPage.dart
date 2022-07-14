@@ -88,17 +88,17 @@ class _AuthPageState extends State<AuthPage> {
                         width: 310,
                         child: Center(
                             child: SizedBox(
-                              width: 256,
+                              width: 246,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text("Don't have account?", style: TextStyle(fontSize: 18, color: Colors.white)),
                                   GestureDetector(
-                                    onTap: registerFunction(),
+                                    onTap: () {Navigator.push(context, MaterialPageRoute(builder: (context)=> const RegisterPage()));},
                                     child: Container(
-                                        height: 40,
+                                        height: 30,
                                         decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: const Color.fromRGBO(50, 0, 100, 1)),
-                                        width: 90,
+                                        width: 80,
                                         child: Center(
                                           child: registerLoadingWidgetArray[registerLoadingState],
                                         )
@@ -177,18 +177,13 @@ class _AuthPageState extends State<AuthPage> {
             String typedEmail= emailController.text;
             String typedPassword= passwordController.text;
             var response= await NetworkHandler().login('login', {'email': typedEmail, 'password': typedPassword});
-            if (response!=null) {
-              List<String> responseList= response.split("%");
-              if (responseList[0]!= 'success') {
-                setState(() {message= 'email or password is incorrect'; loginLoadingState= 0;});
-                ScaffoldMessenger.of(context).showSnackBar(snackBarWidget(message));
-              } else {
-                setState(() {loginLoadingState= 0;});
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> RootPage(responseList: responseList)));
-              }
+            List<String> responseList= response;
+            if (responseList[0]!= 'success') {
+              setState(() {message= responseList[1]; loginLoadingState= 0;});
+              ScaffoldMessenger.of(context).showSnackBar(snackBarWidget(message));
             } else {
               setState(() {loginLoadingState= 0;});
-              ScaffoldMessenger.of(context).showSnackBar(snackBarWidget(message));
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> RootPage(responseList: responseList)));
             }
           },
           child: Center(
@@ -260,17 +255,16 @@ class _AuthPageState extends State<AuthPage> {
   }
 
   //google login function
-  googleLoginFunction() {
+  void Function()? googleLoginFunction() {
+    return null;
+
     //for 14 july 's work
   }
 
   //facebook login function
-  facebookLoginFunction() {
-    //for 14 july 's work
-  }
+  void Function()? facebookLoginFunction() {
+    return null;
 
-  //register function
-  registerFunction() {
-    Navigator.push(context, MaterialPageRoute(builder: (context)=> const RegisterPage()));
+    //for 14 july 's work
   }
 }
