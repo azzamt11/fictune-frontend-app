@@ -82,7 +82,7 @@ class _MeSlideState extends State<MeSlide> {
                       SizedBox(
                         height: favoriteHeight(),
                         width: size.width,
-                        child: novelField('favorite'),
+                        child: novelField('liked'),
                       ),
                     ]
                   )
