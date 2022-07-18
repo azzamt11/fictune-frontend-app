@@ -84,11 +84,12 @@ class _RootPageState extends State<RootPage> {
   }
 
   getBody() {
+    String id= widget.responseList[3];
     return IndexedStack(
       index: activeTab,
       children: [
         HomeSlide(responseList: widget.responseList),
-        Center(
+        const Center(
             child: Text('Search', style: TextStyle(fontSize: 20, color: Color.fromRGBO(50, 0, 100, 1)))
         ),
         MeSlide(responseList: widget.responseList),

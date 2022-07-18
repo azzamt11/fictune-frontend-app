@@ -160,7 +160,7 @@ class _AuthPageState extends State<AuthPage> {
     return(
         Container(
             height: 1,
-            width: min(246, size.width*0.76 -64),
+            width: min(246, size.width*0.76 -60),
             color: const Color.fromRGBO(50, 0, 100, 1)
         )
     );

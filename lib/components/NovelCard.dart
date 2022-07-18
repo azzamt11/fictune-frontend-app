@@ -11,7 +11,8 @@ class NovelCard extends StatefulWidget {
   final String index;
   final String userId;
   final String token;
-  const NovelCard({Key? key, required this.genre, required this.index, required this.userId, required this.token}) : super(key: key);
+  final int custom;
+  const NovelCard({Key? key, required this.genre, required this.index, required this.userId, required this.token, required this.custom}) : super(key: key);
 
   @override
   State<NovelCard> createState() => _NovelCardState();
@@ -20,6 +21,11 @@ class NovelCard extends StatefulWidget {
 class _NovelCardState extends State<NovelCard> {
   bool loadingState= true;
   Widget activeWidget= Center(child: Text('Loading...', style: TextStyle(fontSize: 15, color: AppTheme.themeColor)));
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
   //scaffold
   @override
   Widget build(BuildContext context) {
@@ -34,23 +40,42 @@ class _NovelCardState extends State<NovelCard> {
   }
 
   Future<void> setNovelImage() async{
-    List<String> novelDataArray= await NetworkHandler().getLatestPostsByGenre(widget.genre, widget.index, widget.token);
-    final novelImage= novelDataArray[2];
-    setState(() {
-      activeWidget= Container(
-        height: 150,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            fit: BoxFit.cover,
-            image: MemoryImage(AppFunctions().convertBase64Image(novelImage)),
-          )
-        )
-      );
-    });
+    if (widget.custom==0) {
+      List<String> novelDataArray= await NetworkHandler().getLatestPostsByGenre(widget.genre, widget.index, widget.token);
+      final novelImage= novelDataArray[2];
+      setState(() {
+        activeWidget= Container(
+            height: 150,
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: MemoryImage(AppFunctions().convertBase64Image(novelImage)),
+                )
+            )
+        );
+      });
+    } else {
+      String index=widget.index;
+      print('novel card custom on 1 in progress: on index: $index');
+      List<String> novelDataArray= await NetworkHandler().getPostById(widget.token, index);
+      final novelImage= novelDataArray[1];
+      setState(() {
+        activeWidget= Container(
+            height: 150,
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: MemoryImage(AppFunctions().convertBase64Image(novelImage)),
+                )
+            )
+        );
+      });
+    }
+
   }
 
   Uint8List convertBase64Image(String base64String) {
-    Uint8List bytes= Base64Decoder().convert(base64String.split(',').last);
+    Uint8List bytes= const Base64Decoder().convert(base64String.split(',').last);
     return bytes;
   }
 }

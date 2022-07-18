@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:core';
 import 'package:fictune_frontend/files/RawImageFiles.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
@@ -20,7 +21,7 @@ class NetworkHandler {
       "Content-type": "application/json",
       "Authorization": "Bearer $token"
     };
-    String nodata= RawImageFiles().nodata();
+    String noData= RawImageFiles().noData();
     http.Response response;
     try {
       if (genreInt==0) {
@@ -39,29 +40,50 @@ class NetworkHandler {
       var image= decodedResponse['posts']['post_attribute_3'].toString();
       return ['success', title, image];
     } catch(e) {
-      return ['error', 'something went wrong : $e', nodata];
+      return ['error', 'something went wrong : $e', noData];
     }
 
   }
 
-  //get post by id function
-  Future getSubPostByParentId(String index, String token) async{
+  //get latest post by secondary attribute function
+  Future<List<String>> getFavoritePost(String token, String index) async{
     try {
-      var response = await http.get(Uri.parse("http://ftunebackend.herokuapp.com/api/posts/$index"),
-          headers: {
-            "Content-type": "application/json",
+      var response= await http.get(Uri.parse('http://ftunebackend.herokuapp.com/api/posts/liked/$index'),
+          headers: {"Content-type": "application/json",
             "Authorization": "Bearer $token"
           });
       var decodedResponse= json.decode(response.body);
-      if (decodedResponse['post']!=null) {
-        String response1= decodedResponse['post'][0]['post_body'].toString();
-        String response2= decodedResponse['post'][0]['post_attribute_3'].toString();
-        String response= '$response1%$response2';
-        saveString('user', "post_$index", response);
-        return "success%$response";
+      if (decodedResponse['posts']!=null || decodedResponse['posts']!='') {
+        String response1= decodedResponse['posts'][0]['post_body'].toString();
+        String response2= decodedResponse['posts'][0]['post_attribute_3'].toString();
+        return [response1, response2];
+      } else {
+        return ['error', RawImageFiles().noImage(), 'something went wrong'];
       }
     } catch(e) {
-      return "error%something went wrong";
+      print(e);
+      return ['error', RawImageFiles().noImage(), 'error: $e'];
+    }
+  }
+
+  //get latest post by secondary attribute function
+  Future<List<String>> getPostById(String token, String id) async{
+    try {
+      var response= await http.get(Uri.parse('http://ftunebackend.herokuapp.com/api/posts/$id'),
+          headers: {"Content-type": "application/json",
+            "Authorization": "Bearer $token"
+          });
+      var decodedResponse= json.decode(response.body);
+      if (decodedResponse['post']!=null || decodedResponse['posts']!='') {
+        String response1= decodedResponse['post'][0]['post_body'].toString();
+        String response2= decodedResponse['post'][0]['post_attribute_3'].toString();
+        return [response1, response2];
+      } else {
+        return ['error', RawImageFiles().noImage(), 'something went wrong'];
+      }
+    } catch(e) {
+      print(e);
+      return ['error', RawImageFiles().noImage(), 'error: $e'];
     }
   }
 
@@ -100,6 +122,28 @@ class NetworkHandler {
       "Access-Control-Allow-Origin": "*"
     });
     return response;
+  }
+
+  //user preference function
+  Future<List<String>> getUserLikedNovelIndices(String token) async {
+    try {
+      var response = await http.get(Uri.parse("http://ftunebackend.herokuapp.com/api/user"),
+          headers: {
+            "Content-type": "application/json",
+            "Authorization": "Bearer $token"
+          });
+      var decodedResponse= json.decode(response.body);
+      if (decodedResponse!=null) {
+        String response= decodedResponse['user_attribute_2'].toString();
+        return ['success', response];
+      } else if (decodedResponse['message']!=null) {
+        return ['error', 'request timed out'];
+      } else {
+        return ['error', 'request timed out'];
+      }
+    } catch(e) {
+      return ['error', 'something went wrong : $e'];
+    }
   }
 
   //login function

@@ -123,7 +123,7 @@ class _HomeSlideState extends State<HomeSlide> {
         onTap: () {
           //just do nothing for a while
         },
-        child: NovelCard(userId: userId, genre: '$genre', index: '$index', token: token),
+        child: NovelCard(userId: userId, genre: '$genre', index: '$index', token: token, custom: 0),
     );
   }
 
@@ -148,16 +148,25 @@ class _HomeSlideState extends State<HomeSlide> {
             child: Container(
               height: 150,
               width: size.width,
-              child: ListView.separated(
+              child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                itemCount: 10,
-                separatorBuilder: (context, _)=> const SizedBox(width: 10),
-                itemBuilder: (context, index)=> buildCard(widget.responseList, genre, index),
+                child: Row(
+                  children: novelCardWidget(genre),
+                ),
               ),
             ),
           )
         ]
     );
+  }
+
+  List<Widget> novelCardWidget(int genre) {
+    List<Widget> widgetList= [];
+    for (int i=0; i<10; i++) {
+      widgetList.add(buildCard(widget.responseList, genre, i));
+      widgetList.add(const SizedBox(width: 10));
+    }
+    return widgetList;
   }
 
   //genre text
