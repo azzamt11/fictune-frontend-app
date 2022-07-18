@@ -4,6 +4,7 @@ import 'package:fictune_frontend/network_and_data/NetworkHandler.dart';
 import 'package:flutter/material.dart';
 
 import '../components/NovelCard.dart';
+import '../components/NovelDataCard.dart';
 import '../helper/AppFunctions.dart';
 import '../helper/AppTheme.dart';
 
@@ -213,7 +214,7 @@ class _MeSlideState extends State<MeSlide> {
                 width: size.width-140,
                 child: Column(
                     children: [
-                      Container(height: 50, width: 150, color: const Color.fromRGBO(245, 245, 245, 1)),
+                      Container(height: 50, width: 150, child: NovelDataCard(index: '$index', token: token)),
                       const SizedBox(height: 10),
                       Container(height: 30, width: max(size.width-140, 150), color: const Color.fromRGBO(245, 245, 245, 1)),
                       const SizedBox(height: 5),
