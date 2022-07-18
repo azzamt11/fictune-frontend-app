@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../slides/ExploreSlide.dart';
 import '../slides/HomeSlide.dart';
 import '../slides/MeSlide.dart';
 
@@ -89,9 +90,7 @@ class _RootPageState extends State<RootPage> {
       index: activeTab,
       children: [
         HomeSlide(responseList: widget.responseList),
-        const Center(
-            child: Text('Search', style: TextStyle(fontSize: 20, color: Color.fromRGBO(50, 0, 100, 1)))
-        ),
+        ExploreSlide(responseList: widget.responseList),
         MeSlide(responseList: widget.responseList),
       ],
     );
