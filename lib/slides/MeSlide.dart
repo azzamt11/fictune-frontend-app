@@ -208,7 +208,7 @@ class _MeSlideState extends State<MeSlide> {
                 ),
             ),
             const SizedBox(width: 10),
-            Container(
+            SizedBox(
                 height: 150,
                 width: size.width-140,
                 child: Column(
