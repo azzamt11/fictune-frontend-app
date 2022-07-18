@@ -170,6 +170,7 @@ class _MeSlideState extends State<MeSlide> {
                 height: 150,
                 width: size.width-140,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(height: 50, width: 150, color: const Color.fromRGBO(245, 245, 245, 1)),
                     const SizedBox(height: 10),
