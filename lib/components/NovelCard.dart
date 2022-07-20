@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'dart:convert';
+import 'package:fictune_frontend/files/RawImageFiles.dart';
 import 'package:flutter/material.dart';
 
 import '../helper/AppFunctions.dart';
@@ -54,11 +55,12 @@ class _NovelCardState extends State<NovelCard> {
             )
         );
       });
-    } else {
+    } else if (widget.custom==1) {
       String index=widget.index;
       print('novel card custom on 1 in progress: on index: $index');
       List<String> novelDataArray= await NetworkHandler().getPostById(widget.token, index);
-      final novelImage= novelDataArray[1];
+      final novelImage= novelDataArray[2];
+      NetworkHandler().saveString('user', 'liked_novels_images_$index', novelImage);
       setState(() {
         activeWidget= Container(
             height: 150,
@@ -66,6 +68,22 @@ class _NovelCardState extends State<NovelCard> {
                 image: DecorationImage(
                   fit: BoxFit.cover,
                   image: MemoryImage(AppFunctions().convertBase64Image(novelImage)),
+                )
+            )
+        );
+      });
+    } else {
+      String index=widget.index;
+      print('novel card custom on 2 in progress: on index: $index');
+      String? novelImage= await NetworkHandler().getString('user', 'liked_novels_images_$index');
+      print(novelImage);
+      setState(() {
+        activeWidget= Container(
+            height: 150,
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: MemoryImage(AppFunctions().convertBase64Image(novelImage?? RawImageFiles().noImage())),
                 )
             )
         );

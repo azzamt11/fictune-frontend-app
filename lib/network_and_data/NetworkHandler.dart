@@ -77,13 +77,36 @@ class NetworkHandler {
       if (decodedResponse['post']!=null || decodedResponse['posts']!='') {
         String response1= decodedResponse['post'][0]['post_body'].toString();
         String response2= decodedResponse['post'][0]['post_attribute_3'].toString();
-        return [response1, response2];
+        return ['success', response1, response2];
       } else {
-        return ['error', RawImageFiles().noImage(), 'something went wrong'];
+        return ['error', 'error<divider%69>something went wrong', RawImageFiles().noImage()];
       }
     } catch(e) {
       print(e);
-      return ['error', RawImageFiles().noImage(), 'error: $e'];
+      return ['error', 'error<divider%69>something went wrong: $e', RawImageFiles().noImage()];
+    }
+  }
+
+  //get latest post by secondary attribute function
+  Future<List<List<String>>> getMultiplePostsByIdList(String token, String idList) async{
+    print('get multiple post in progress');
+    List<List<String>> novelResponseList= [];
+    var response= await http.post(Uri.parse('http://ftunebackend.herokuapp.com/api/posts/getbyindices'),
+        headers: {"Content-type": "application/json",
+          "Authorization": "Bearer $token"
+        });
+    var decodedResponse= json.decode(response.body);
+    if (decodedResponse['posts']!=null || decodedResponse['posts']!='') {
+      for (int i=0; i<decodedResponse['posts'].length; i++) {
+        String response1= decodedResponse['posts'][i+1][0]['post_body'];
+        String response2= decodedResponse['posts'][i+1][0]['post_attribute_1'];
+        novelResponseList.add(['success', response1, response2]);
+      }
+      print('response on multiple posts:'+ decodedResponse + novelResponseList[0][0]);
+      return novelResponseList;
+    } else {
+      print('response on multiple posts:'+ decodedResponse + novelResponseList[0][0]);
+      return [['error', 'error', RawImageFiles().noImage()]];
     }
   }
 
@@ -126,16 +149,21 @@ class NetworkHandler {
 
   //user preference function
   Future<List<String>> getUserLikedNovelIndices(String token) async {
-    try {
-      var response = await http.get(Uri.parse("http://ftunebackend.herokuapp.com/api/user"),
-          headers: {
-            "Content-type": "application/json",
-            "Authorization": "Bearer $token"
-          });
-      var decodedResponse= json.decode(response.body);
-      if (decodedResponse!=null) {
-        String response= decodedResponse['user_attribute_2'].toString();
-        return ['success', response];
+    var response = await http.get(Uri.parse("http://ftunebackend.herokuapp.com/api/user"),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer $token"
+        });
+    var decodedResponse= json.decode(response.body);
+    if (decodedResponse!=null) {
+      String response= decodedResponse['user_attribute_2'].toString();
+      print(decodedResponse);
+      return ['success', response];
+    } else {
+      return ['error', 'something went wrong'];
+    }
+    /*try {
+
       } else if (decodedResponse['message']!=null) {
         return ['error', 'request timed out'];
       } else {
@@ -143,7 +171,7 @@ class NetworkHandler {
       }
     } catch(e) {
       return ['error', 'something went wrong : $e'];
-    }
+    }*/
   }
 
   //login function

@@ -23,8 +23,8 @@ class _HomeSlideState extends State<HomeSlide> {
     String userImage= widget.responseList[4];
     String userUserData= widget.responseList[5];
     String userBillingData= widget.responseList[6];
-    String coin= userBillingData.split('*')[0];
-    String userUserName= userUserData.split('*')[0];
+    String coin= userBillingData.split('<divider%54>')[0];
+    String userUserName= userUserData.split('<divider%54>')[0];
     var themeColor= AppTheme.themeColor;
     return CustomScrollView(
       slivers: [
@@ -53,8 +53,12 @@ class _HomeSlideState extends State<HomeSlide> {
                 height: 70,
                 child: Center(
                     child: CircleAvatar(
-                        backgroundImage: MemoryImage(AppFunctions().convertBase64Image(userImage)),
-                        radius: 25
+                      radius: 26,
+                      backgroundColor: AppTheme.themeColor,
+                      child: CircleAvatar(
+                          backgroundImage: MemoryImage(AppFunctions().convertBase64Image(userImage)),
+                          radius: 25, 
+                      ),
                     )
                 )
             ),
@@ -64,16 +68,12 @@ class _HomeSlideState extends State<HomeSlide> {
             height: 70,
             child: Row(
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 70,
-                  width: 51,
+                  width: 55,
                   child: Align(
                     alignment: Alignment.centerRight,
-                    child: Container(
-                      decoration: const BoxDecoration(image: DecorationImage(image: AssetImage('assets/images/coin.jpg'))),
-                      height: 35,
-                      width: 35,
-                    ),
+                    child: CircleAvatar(backgroundImage: AssetImage('assets/images/coin.jpg'), radius: 20,)
                   ),
                 ),
                 Align(

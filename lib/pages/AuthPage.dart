@@ -61,7 +61,7 @@ class _AuthPageState extends State<AuthPage> {
             color: Colors.black54,
             child: Center(
               child: SizedBox(
-                height: 430,
+                height: 400,
                 width: size.width,
                 child: Column(
                   children: [
@@ -84,7 +84,7 @@ class _AuthPageState extends State<AuthPage> {
                         )
                     ),
                     SizedBox(
-                        height: 50,
+                        height: 40,
                         width: 310,
                         child: Center(
                             child: SizedBox(
