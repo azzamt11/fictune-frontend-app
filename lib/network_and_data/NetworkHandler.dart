@@ -178,11 +178,11 @@ class NetworkHandler {
           }
           return finalResponse;
         } else {
-        return [['0', 'error: something went wrong', RawImageFiles().noData()]];
+        return [['0', 'error<divider%69>something went wrong', RawImageFiles().noData()]];
       }
     } catch(e) {
       print(e);
-      return [['0', 'error: $e', RawImageFiles().noData()]];
+      return [['0', 'error<divider%69>$e', RawImageFiles().noData()]];
     }
   }
 

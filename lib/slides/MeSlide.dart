@@ -329,6 +329,8 @@ class _MeSlideState extends State<MeSlide> {
     var size= MediaQuery.of(context).size;
     List<Widget> widgetList= [];
     for (int i=0; i<max(novelData.length-1, 1); i++) {
+      String novelDatai= novelData[i];
+      print('novel data i : $novelDatai');
       widgetList.add(Container(
           height: 160,
           width: size.width,
@@ -357,7 +359,7 @@ class _MeSlideState extends State<MeSlide> {
                             width: 150,
                             child: Align(
                               alignment: Alignment.topLeft,
-                              child: Text(novelData[i].split('<divider%83>')[1].split('<divider%69>')[0], style: TextStyle(fontSize: 18, color: AppTheme.themeColor)),
+                              child: Text(novelData[i].split('<divider%83>')[1].split('<divider%69>')[0], style: TextStyle(fontSize: 20, color: AppTheme.themeColor, fontWeight: FontWeight.bold)),
                             )
                           ),
                           const SizedBox(height: 10),
@@ -366,7 +368,7 @@ class _MeSlideState extends State<MeSlide> {
                               width: max(size.width-146, 150),
                               child: Align(
                                 alignment: Alignment.topLeft,
-                                child: Text(novelData[i].split('<divider%83>')[1].split('<divider%69>')[1], style: TextStyle(fontSize: 18, color: AppTheme.themeColor)),
+                                child: Text(novelData[i].split('<divider%83>')[1].split('<divider%69>')[1], style: TextStyle(fontSize: 17, color: AppTheme.themeColor)),
                               )
                           ),
                         ]
