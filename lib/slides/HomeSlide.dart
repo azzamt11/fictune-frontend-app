@@ -4,6 +4,7 @@ import '../components/MainPageView.dart';
 import '../components/NovelCard.dart';
 import '../helper/AppFunctions.dart';
 import '../helper/AppTheme.dart';
+import '../pages/NovelPage.dart';
 
 //home page constructor
 class HomeSlide extends StatefulWidget {
@@ -119,9 +120,10 @@ class _HomeSlideState extends State<HomeSlide> {
   Widget buildCard(List<String> responseList, int genre, int index) {
     String token= responseList[1];
     String userId= responseList[3];
+    List<String> novelData= [token, userId, '$genre', '$index'];
     return GestureDetector(
         onTap: () {
-          //just do nothing for a while
+          Navigator.push(context, MaterialPageRoute(builder: (context)=> NovelPage(novelData: novelData)));
         },
         child: NovelCard(userId: userId, genre: '$genre', index: '$index', token: token, custom: 0),
     );

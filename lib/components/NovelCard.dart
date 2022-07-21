@@ -57,10 +57,11 @@ class _NovelCardState extends State<NovelCard> {
       });
     } else if (widget.custom==1) {
       String index=widget.index;
-      print('novel card custom on 1 in progress: on index: $index');
       List<String> novelDataArray= await NetworkHandler().getPostById(widget.token, index);
+      final novelTitle= novelDataArray[1];
       final novelImage= novelDataArray[2];
-      NetworkHandler().saveString('user', 'liked_novels_images_$index', novelImage);
+      NetworkHandler().saveString('user', 'novels_titles_$index', novelTitle);
+      NetworkHandler().saveString('user', 'novels_images_$index', novelImage);
       setState(() {
         activeWidget= Container(
             height: 150,
@@ -75,7 +76,7 @@ class _NovelCardState extends State<NovelCard> {
     } else {
       String index=widget.index;
       print('novel card custom on 2 in progress: on index: $index');
-      String? novelImage= await NetworkHandler().getString('user', 'liked_novels_images_$index');
+      String? novelImage= await NetworkHandler().getString('user', 'novels_images_$index');
       print(novelImage);
       setState(() {
         activeWidget= Container(

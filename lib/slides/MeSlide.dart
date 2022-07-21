@@ -379,7 +379,7 @@ class _MeSlideState extends State<MeSlide> {
       ));
     }
     if (widgetList==[]) {
-      return [Container(height: 160, width: size.width, child: Center(child: Text("You have'nt liked any novels")))];
+      return [Container(height: 160, width: size.width, child: const Center(child: Text("You haven't liked any novels")))];
     } else {
       return widgetList;
     }
