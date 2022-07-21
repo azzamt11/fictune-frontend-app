@@ -157,20 +157,45 @@ class NetworkHandler {
     var decodedResponse= json.decode(response.body);
     if (decodedResponse!=null) {
       String response= decodedResponse['user_attribute_2'].toString();
+      String finalResponse= response.split('<divider%39>')[0];
       print(decodedResponse);
-      return ['success', response];
+      return ['success', finalResponse];
     } else {
       return ['error', 'something went wrong'];
     }
+  }
+
+  //user preference function
+  Future<List<List<String>>> getUserNovels(String token) async {
+    print('get user novel in progress (next: decoded response)');
+    print('token: $token');
+    List<List<String>> finalResponse= [];
+    var response = await http.get(Uri.parse("http://ftunebackend.herokuapp.com/api/userposts"),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer $token"
+        });
+    var decodedResponse= json.decode(response.body);
+    print('my novels decoded response: $decodedResponse');
+    if (decodedResponse!=null) {
+      for(int i=0; i<decodedResponse.length; i++) {
+        String novelId= decodedResponse['user_posts'][i]['id'].toString();
+        String novelTitle= decodedResponse['user_posts'][i]['post_body'].toString();
+        String novelImage= decodedResponse['user_posts'][i]['post_attribute_3'].toString();
+        finalResponse.add([novelId, novelTitle, novelImage]);
+      }
+    }
+    String finalResponse0attribute3= finalResponse[0][2];
+    print('final response [0] attribute3: $finalResponse0attribute3 (next: me slide- my novel data)');
+      return finalResponse;
     /*try {
 
-      } else if (decodedResponse['message']!=null) {
-        return ['error', 'request timed out'];
       } else {
-        return ['error', 'request timed out'];
+        return [['0', 'Loading...', RawImageFiles().noData()]];
       }
     } catch(e) {
-      return ['error', 'something went wrong : $e'];
+      print(e);
+      return [['0', 'error: $e', RawImageFiles().noData()]];
     }*/
   }
 

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../components/NovelCard.dart';
 import '../components/NovelDataCard.dart';
+import '../components/NovelDirectCard.dart';
 import '../helper/AppFunctions.dart';
 import '../helper/AppTheme.dart';
 
@@ -19,12 +20,27 @@ class MeSlide extends StatefulWidget {
 class _MeSlideState extends State<MeSlide> {
   final List<Color> colorArray= [Colors.white, AppTheme.themeColor];
   int colorState= 0;
+  int activeSubWidget= 0;
 
   Future<String> getFavoriteNovelIndices() async {
     final String token = widget.responseList[1];
     final List<String> favoriteNovelData= await NetworkHandler().getUserLikedNovelIndices(token);
     String favoriteNovelIndices= favoriteNovelData[1];
     return favoriteNovelIndices;
+  }
+
+  Future<String> getMyNovelData() async {
+    print('get my novel data in progress (next: get user novels)');
+    final String token = widget.responseList[1];
+    final List<List<String>> myNovelData= await NetworkHandler().getUserNovels(token);
+    String myNovelDataString= '';
+    String myNovelData00= myNovelData[0][0];
+    print('me slide- my novel data [0][0]: $myNovelData00');
+    for(int i =0; i<myNovelData.length; i++) {
+      myNovelDataString= myNovelDataString+ myNovelData[i][0]+ '<divider%83>'+ myNovelData[i][1] + '<divider%83>'+ myNovelData[i][2]+ '<divider%71>';
+    }
+    print('my novel data string: '+ myNovelDataString);
+    return myNovelDataString;
   }
 
   @override
@@ -137,8 +153,23 @@ class _MeSlideState extends State<MeSlide> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
-                          Text('Liked novels', style: TextStyle(fontSize: 20, color: AppTheme.themeColor)),
-                          Text('My novels', style: TextStyle(fontSize: 20, color: AppTheme.themeColor)),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                activeSubWidget=0;
+                              });
+                            },
+                            child: Text('Liked novels', style: TextStyle(fontSize: 20, color: AppTheme.themeColor)),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                activeSubWidget=1;
+                              });
+                            },
+                            child: Text('My novels', style: TextStyle(fontSize: 20, color: AppTheme.themeColor)),
+                          ),
+
                         ],
                       )
                   ),
@@ -149,12 +180,12 @@ class _MeSlideState extends State<MeSlide> {
                         Container(
                           height: 5,
                           width: 0.5*(size.width-36),
-                          color: colorArray[1-colorState],
+                          color: colorArray[1-activeSubWidget],
                         ),
                         Container(
                           height: 5,
                           width: 0.5*(size.width-36),
-                          color: colorArray[colorState],
+                          color: colorArray[activeSubWidget],
                         ),
                       ],
                     ),
@@ -168,10 +199,20 @@ class _MeSlideState extends State<MeSlide> {
                   SizedBox(
                     height: size.height-471,
                     width: size.width,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: getFavoriteNovelsList(),
-                    ),
+                    child: IndexedStack(
+                      index: activeSubWidget,
+                      children: [
+                        SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: getFavoriteNovelsList(),
+                        ),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: getMyNovelsList(),
+                        ),
+
+                      ]
+                    )
                   ),
                 ]
             ),
@@ -190,6 +231,28 @@ class _MeSlideState extends State<MeSlide> {
           List<String> favoriteNovelIndicesList= favoriteNovelIndices.split('%');
           return Column(
             children: widgetList(favoriteNovelIndicesList, true),
+          );
+        } else {
+          return Column(
+            children: widgetList(['0', '0', '0', '0'],false),
+          );
+        }
+      },
+    );
+  }
+
+  Widget getMyNovelsList() {
+    print('get my novels list in progress (next: get my novel data)');
+    return FutureBuilder(
+      future: getMyNovelData(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          print('snapshot has data on my novels list: true');
+          String myNovelDataString= snapshot.data.toString();
+          List<String> myNovelData= myNovelDataString.split('<divider%71>');
+          print('(next: novel direct card widget) my novel data string: '+ myNovelDataString);
+          return Column(
+            children: novelDirectCard(myNovelData),
           );
         } else {
           return Column(
@@ -223,7 +286,7 @@ class _MeSlideState extends State<MeSlide> {
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(height: 50, width: 150, color: const Color.fromRGBO(245, 245, 245, 1)),
+                            Container(height: 35, width: 150, color: const Color.fromRGBO(245, 245, 245, 1)),
                             const SizedBox(height: 10),
                             Container(height: 100, width: max(size.width-146, 150), color: const Color.fromRGBO(245, 245, 245, 1)),
                           ]
@@ -267,4 +330,44 @@ class _MeSlideState extends State<MeSlide> {
     );
   }
 
+  List<Widget> novelDirectCard(List<String> novelData) {
+    int novelDataLength= novelData.length;
+    var size= MediaQuery.of(context).size;
+    List<Widget> widgetList= [];
+    for (int i=0; i<max(novelData.length-1, 1); i++) {
+      widgetList.add(Container(
+          height: 160,
+          width: size.width,
+          padding: const EdgeInsets.only(left: 18, right: 18, top: 5, bottom: 5),
+          child: Row(
+              children: [
+                SizedBox(
+                  height: 150,
+                  width: 100,
+                  child: GestureDetector(
+                    onTap: () {
+                      //just do nothing for a while
+                    },
+                    child: NovelDirectCard(novelData: novelData[i]),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                SizedBox(
+                    height: 150,
+                    width: size.width-146,
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(height: 35, width: 150, color: const Color.fromRGBO(245, 245, 245, 1)),
+                          const SizedBox(height: 10),
+                          Container(height: 100, width: max(size.width-146, 150), color: const Color.fromRGBO(245, 245, 245, 1)),
+                        ]
+                    )
+                ),
+              ]
+          )
+      ));
+    }
+    return widgetList;
+  }
 }
