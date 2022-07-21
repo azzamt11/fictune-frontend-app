@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../helper/AppFunctions.dart';
 import '../helper/AppTheme.dart';
-import '../network_and_data/NetworkHandler.dart';
-import 'AuthPage.dart';
-import 'RootPage.dart';
 
 class InitialPage extends StatefulWidget {
   const InitialPage({Key? key}) : super(key: key);

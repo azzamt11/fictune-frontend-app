@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 import 'dart:convert';
-import 'package:fictune_frontend/files/RawImageFiles.dart';
 import 'package:flutter/material.dart';
 
 import '../helper/AppFunctions.dart';
@@ -30,8 +29,8 @@ class _NovelCardState extends State<NovelCard> {
   //scaffold
   @override
   Widget build(BuildContext context) {
-    print('novel card in progress');
-    if (loadingState==true) {setNovelImage(); setState(() {loadingState=false;});}
+    print('novel card in progress (next: set novel image)');
+    if (loadingState==true) {setNovelImage(); setState(() {loadingState= false;});}
     return Container(
       height: 150,
       width: 100,
@@ -41,23 +40,11 @@ class _NovelCardState extends State<NovelCard> {
   }
 
   Future<void> setNovelImage() async{
+    String index=widget.index;
+    String genre=widget.genre;
+    String token=widget.token;
     if (widget.custom==0) {
-      List<String> novelDataArray= await NetworkHandler().getLatestPostsByGenre(widget.genre, widget.index, widget.token);
-      final novelImage= novelDataArray[2];
-      setState(() {
-        activeWidget= Container(
-            height: 150,
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                  fit: BoxFit.cover,
-                  image: MemoryImage(AppFunctions().convertBase64Image(novelImage)),
-                )
-            )
-        );
-      });
-    } else if (widget.custom==1) {
-      String index=widget.index;
-      List<String> novelDataArray= await NetworkHandler().getPostById(widget.token, index);
+      List<String> novelDataArray= await NetworkHandler().getLatestPostsByGenre(genre, index, token);
       final novelTitle= novelDataArray[1];
       final novelImage= novelDataArray[2];
       NetworkHandler().saveString('user', 'novels_titles_$index', novelTitle);
@@ -69,22 +56,6 @@ class _NovelCardState extends State<NovelCard> {
                 image: DecorationImage(
                   fit: BoxFit.cover,
                   image: MemoryImage(AppFunctions().convertBase64Image(novelImage)),
-                )
-            )
-        );
-      });
-    } else {
-      String index=widget.index;
-      print('novel card custom on 2 in progress: on index: $index');
-      String? novelImage= await NetworkHandler().getString('user', 'novels_images_$index');
-      print(novelImage);
-      setState(() {
-        activeWidget= Container(
-            height: 150,
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                  fit: BoxFit.cover,
-                  image: MemoryImage(AppFunctions().convertBase64Image(novelImage?? RawImageFiles().noImage())),
                 )
             )
         );

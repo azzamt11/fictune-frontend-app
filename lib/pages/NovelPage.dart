@@ -18,7 +18,7 @@ class _NovelPageState extends State<NovelPage> {
   bool imageLoading= true;
   bool titleLoading= true;
   bool novelDataHasBeenLoadedFromNetwork= false;
-  String novelTitle= 'Loading...<divider%69>loading...';
+  String novelTitle= 'Loading...<divider%69>loading...<divider%69>';
   String novelImage= RawImageFiles().noImage();
 
   @override
@@ -28,6 +28,7 @@ class _NovelPageState extends State<NovelPage> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70),
         child: AppBar(
+          backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
           centerTitle: true,
           title: Text(novelTitle.split('<divider%69>')[0], style: TextStyle(fontSize: 18, color: AppTheme.themeColor)),
           elevation: 0,
@@ -64,6 +65,7 @@ class _NovelPageState extends State<NovelPage> {
                   padding: const EdgeInsets.only(left: 20, right: 20),
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         getNovelTitleContainer(titleLoading, 0, 20, 'Title', 35, 150, true),
                         const SizedBox(height: 12),
@@ -94,7 +96,7 @@ class _NovelPageState extends State<NovelPage> {
             ),
           ),
           Container(
-            height: size.height-285,
+            height: size.height-348,
             width: size.width,
             padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
             child: Column(
@@ -174,12 +176,13 @@ class _NovelPageState extends State<NovelPage> {
         color: const Color.fromRGBO(245, 245, 245, 1),
       );
     } else {
+      print('novel TITLE: '+ novelTitle);
       return Container(
         height: height,
         width: width,
         child: Align(
           alignment: Alignment.topLeft,
-          child: Text('$text: '+ novelTitle.split('<divider&69>')[index], style: TextStyle(fontSize: fontSize, color: AppTheme.themeColor, fontWeight: bold? FontWeight.bold : FontWeight.normal)),
+          child: Text('$text: '+ novelTitle.split('<divider%69>')[index], style: TextStyle(fontSize: fontSize, color: AppTheme.themeColor, fontWeight: bold? FontWeight.bold : FontWeight.normal)),
         ),
       );
     }

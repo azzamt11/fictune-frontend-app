@@ -17,6 +17,21 @@ class AppFunctions {
   //root-login navigation
   Future<void> navigateToRootOrLogin(context) async{
     String? response1= await NetworkHandler().getString('user', 'token');
+    if (response1!=null) {
+      List<String> likedNovelIndices= await NetworkHandler().getUserLikedNovelIndices(response1);
+      String likedNovelIndicesString= likedNovelIndices[1];
+      List<String> likedNovelIndicesArray= likedNovelIndicesString.split('%');
+      for (int i=0; i<likedNovelIndicesArray.length; i++) {
+        String likedNovelIndex= likedNovelIndicesArray[i];
+        String? novelImage= await NetworkHandler().getString('user', 'novels_images_$likedNovelIndex');
+        if (novelImage==null) {
+          print('null novel detected, get post by id for id $likedNovelIndex is in progress');
+          List<String> novelData= await NetworkHandler().getPostById(response1, likedNovelIndex);
+          novelImage= novelData[2];
+        }
+        NetworkHandler().saveString('user', 'novels_images_$likedNovelIndex', novelImage);
+      }
+    }
     String? response2= await NetworkHandler().getString('user', 'user_name');
     String? response3= await NetworkHandler().getString('user', 'user_id');
     String? response4= await NetworkHandler().getString('user', 'user_attribute');

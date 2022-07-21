@@ -12,6 +12,12 @@ class NovelDirectCard extends StatefulWidget {
 
 class _NovelDirectCardState extends State<NovelDirectCard> {
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     print('novel Direct card in progress (next: novel image)');
     String novelImage= widget.novelData.split('<divider%83>')[2];

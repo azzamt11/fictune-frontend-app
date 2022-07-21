@@ -40,7 +40,7 @@ class NetworkHandler {
       var image= decodedResponse['posts']['post_attribute_3'].toString();
       return ['success', title, image];
     } catch(e) {
-      return ['error', 'something went wrong : $e', noData];
+      return ['error', 'something went wrong :<divider%69>$e', noData];
     }
   }
 
@@ -159,7 +159,7 @@ class NetworkHandler {
     }
   }
 
-  //user preference function
+  //user novels data
   Future<List<List<String>>> getUserNovels(String token) async {
     List<List<String>> finalResponse= [];
     try {
@@ -178,6 +178,33 @@ class NetworkHandler {
           }
           return finalResponse;
         } else {
+        return [['0', 'error<divider%69>something went wrong', RawImageFiles().noData()]];
+      }
+    } catch(e) {
+      print(e);
+      return [['0', 'error<divider%69>$e', RawImageFiles().noData()]];
+    }
+  }
+
+  //user liked novels data
+  Future<List<List<String>>> getUserLikedNovels(String token) async {
+    List<List<String>> finalResponse= [];
+    try {
+      var response = await http.post(Uri.parse("http://ftunebackend.herokuapp.com/api/posts/likedposts"),
+          headers: {
+            "Content-type": "application/json",
+            "Authorization": "Bearer $token"
+          });
+      var decodedResponse= json.decode(response.body);
+      if (decodedResponse!=null) {
+        for(int i=0; i<decodedResponse.length; i++) {
+          String novelId= decodedResponse['posts'][i][0]['id'].toString();
+          String novelTitle= decodedResponse['posts'][i][0]['post_body'].toString();
+          String novelImage= decodedResponse['posts'][i][0]['post_attribute_3'].toString();
+          finalResponse.add([novelId, novelTitle, novelImage]);
+        }
+        return finalResponse;
+      } else {
         return [['0', 'error<divider%69>something went wrong', RawImageFiles().noData()]];
       }
     } catch(e) {

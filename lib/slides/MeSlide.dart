@@ -19,14 +19,19 @@ class MeSlide extends StatefulWidget {
 
 class _MeSlideState extends State<MeSlide> {
   final List<Color> colorArray= [Colors.white, AppTheme.themeColor];
+  bool favoriteNovelLoadingState=true;
+  bool myNovelLoadingState=true;
   int colorState= 0;
   int activeSubWidget= 0;
 
-  Future<String> getFavoriteNovelIndices() async {
+  Future<String> getFavoriteNovelData() async {
     final String token = widget.responseList[1];
-    final List<String> favoriteNovelData= await NetworkHandler().getUserLikedNovelIndices(token);
-    String favoriteNovelIndices= favoriteNovelData[1];
-    return favoriteNovelIndices;
+    final List<List<String>> favoriteNovelData= await NetworkHandler().getUserLikedNovels(token);
+    String favoriteNovelDataString= '';
+    for(int i =0; i<favoriteNovelData.length; i++) {
+      favoriteNovelDataString= favoriteNovelDataString+ favoriteNovelData[i][0]+ '<divider%83>'+ favoriteNovelData[i][1] + '<divider%83>'+ favoriteNovelData[i][2]+ '<divider%71>';
+    }
+    return favoriteNovelDataString;
   }
 
   Future<String> getMyNovelData() async {
@@ -217,15 +222,15 @@ class _MeSlideState extends State<MeSlide> {
     );
   }
 
-  Widget getFavoriteNovelsList() {
+  Widget getMyNovelsList() {
     return FutureBuilder(
-      future: getFavoriteNovelIndices(),
+      future: getMyNovelData(),
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          String favoriteNovelIndices= snapshot.data.toString();
-          List<String> favoriteNovelIndicesList= favoriteNovelIndices.split('%');
+        if (snapshot.hasData && myNovelLoadingState) {
+          String myNovelDataString= snapshot.data.toString();
+          List<String> myNovelData= myNovelDataString.split('<divider%71>');
           return Column(
-            children: widgetList(favoriteNovelIndicesList, true),
+            children: novelDirectCard(myNovelData, false),
           );
         } else {
           return Column(
@@ -236,18 +241,18 @@ class _MeSlideState extends State<MeSlide> {
     );
   }
 
-  Widget getMyNovelsList() {
-    print('get my novels list in progress (next: get my novel data)');
+  Widget getFavoriteNovelsList() {
+    print('get my novels list in progress (next: get favorite novel data)');
     return FutureBuilder(
-      future: getMyNovelData(),
+      future: getFavoriteNovelData(),
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          print('snapshot has data on my novels list: true');
-          String myNovelDataString= snapshot.data.toString();
-          List<String> myNovelData= myNovelDataString.split('<divider%71>');
-          print('(next: novel direct card widget) my novel data string: '+ myNovelDataString);
+        if (snapshot.hasData && favoriteNovelLoadingState) {
+          print('snapshot has data on favorite novels list: true');
+          String favoriteNovelDataString= snapshot.data.toString();
+          List<String> favoriteNovelData= favoriteNovelDataString.split('<divider%71>');
+          print('(next: novel direct card widget) favorite novel data string: '+ favoriteNovelDataString);
           return Column(
-            children: novelDirectCard(myNovelData),
+            children: novelDirectCard(favoriteNovelData, true),
           );
         } else {
           return Column(
@@ -259,78 +264,49 @@ class _MeSlideState extends State<MeSlide> {
   }
 
   List<Widget> widgetList(List<String> novelsList, bool loaded) {
+    print('widget list in progress (next: build card)');
     var size= MediaQuery.of(context).size;
     List<Widget> widgetList= [];
-    if (loaded==true) {
-      for (int i=0; i<novelsList.length; i++) {
-        widgetList.add(buildCard(widget.responseList, int.parse(novelsList[i])));
-      }
-    } else {
-      for (int i=0; i<novelsList.length; i++) {
-        widgetList.add(Container(
-            height: 160,
-            width: size.width,
-            padding: const EdgeInsets.only(left: 18, right: 18, top: 5, bottom: 5),
-            child: Row(
-                children: [
-                  Container(height: 150, width: 100, color: const Color.fromRGBO(245, 245, 245, 1)),
-                  const SizedBox(width: 10),
-                  SizedBox(
-                      height: 150,
-                      width: size.width-146,
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(height: 35, width: 150, color: const Color.fromRGBO(245, 245, 245, 1)),
-                            const SizedBox(height: 10),
-                            Container(height: 100, width: max(size.width-146, 150), color: const Color.fromRGBO(245, 245, 245, 1)),
-                          ]
-                      )
+    for (int i=0; i<novelsList.length; i++) {
+      widgetList.add(Container(
+          height: 160,
+          width: size.width,
+          padding: const EdgeInsets.only(left: 18, right: 18, top: 5, bottom: 5),
+          child: Row(
+              children: [
+                Container(
+                  height: 150,
+                  width: 100,
+                  color: const Color.fromRGBO(245, 245, 245, 1),
+                  child: Center(
+                    child: Text('Loading...', style: TextStyle(fontSize: 18, color: AppTheme.themeColor)),
                   ),
-                ]
-            )
-        ));
-      }
+                ),
+                const SizedBox(width: 10),
+                SizedBox(
+                    height: 150,
+                    width: size.width-146,
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(height: 35, width: 150, color: const Color.fromRGBO(245, 245, 245, 1)),
+                          const SizedBox(height: 10),
+                          Container(height: 100, width: max(size.width-146, 150), color: const Color.fromRGBO(245, 245, 245, 1)),
+                        ]
+                    )
+                ),
+              ]
+          )
+      ));
     }
     return widgetList;
   }
 
-  Widget buildCard(List<String> responseList, int index) {
-    var size= MediaQuery.of(context).size;
-    String token= responseList[1];
-    return Container(
-      height: 160,
-      width: size.width,
-      padding: const EdgeInsets.only(left: 18, right: 18, top: 5, bottom: 5),
-      child: Row(
-          children: [
-            SizedBox(
-              height: 150,
-              width: 100,
-              child: GestureDetector(
-                onTap: () {
-                  //just do nothing for a while
-                },
-                child: NovelCard(index: '$index', token: token, custom: 2, genre: '0', userId: '1',),
-              ),
-            ),
-            const SizedBox(width: 10),
-            SizedBox(
-                height: 150,
-                width: size.width-146,
-                child: NovelDataCard(custom: 1, index: '$index', token: token),
-            ),
-          ]
-      ),
-    );
-  }
-
-  List<Widget> novelDirectCard(List<String> novelData) {
+  List<Widget> novelDirectCard(List<String> novelData, bool isFavoriteNovel) {
     var size= MediaQuery.of(context).size;
     List<Widget> widgetList= [];
+    print('my novel loading state : $myNovelLoadingState,  favorite novel loading state : $favoriteNovelLoadingState');
     for (int i=0; i<max(novelData.length-1, 1); i++) {
-      String novelDatai= novelData[i];
-      print('novel data i : $novelDatai');
       widgetList.add(Container(
           height: 160,
           width: size.width,
@@ -379,7 +355,7 @@ class _MeSlideState extends State<MeSlide> {
       ));
     }
     if (widgetList==[]) {
-      return [Container(height: 160, width: size.width, child: const Center(child: Text("You haven't liked any novels")))];
+      return [SizedBox(height: 160, width: size.width, child: const Center(child: Text("You haven't liked any novels")))];
     } else {
       return widgetList;
     }
