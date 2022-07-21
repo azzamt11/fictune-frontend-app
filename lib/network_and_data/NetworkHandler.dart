@@ -42,7 +42,6 @@ class NetworkHandler {
     } catch(e) {
       return ['error', 'something went wrong : $e', noData];
     }
-
   }
 
   //get latest post by secondary attribute function
@@ -82,14 +81,12 @@ class NetworkHandler {
         return ['error', 'error<divider%69>something went wrong', RawImageFiles().noImage()];
       }
     } catch(e) {
-      print(e);
       return ['error', 'error<divider%69>something went wrong: $e', RawImageFiles().noImage()];
     }
   }
 
   //get latest post by secondary attribute function
   Future<List<List<String>>> getMultiplePostsByIdList(String token, String idList) async{
-    print('get multiple post in progress');
     List<List<String>> novelResponseList= [];
     var response= await http.post(Uri.parse('http://ftunebackend.herokuapp.com/api/posts/getbyindices'),
         headers: {"Content-type": "application/json",
@@ -102,10 +99,8 @@ class NetworkHandler {
         String response2= decodedResponse['posts'][i+1][0]['post_attribute_1'];
         novelResponseList.add(['success', response1, response2]);
       }
-      print('response on multiple posts:'+ decodedResponse + novelResponseList[0][0]);
       return novelResponseList;
     } else {
-      print('response on multiple posts:'+ decodedResponse + novelResponseList[0][0]);
       return [['error', 'error', RawImageFiles().noImage()]];
     }
   }
@@ -158,7 +153,6 @@ class NetworkHandler {
     if (decodedResponse!=null) {
       String response= decodedResponse['user_attribute_2'].toString();
       String finalResponse= response.split('<divider%39>')[0];
-      print(decodedResponse);
       return ['success', finalResponse];
     } else {
       return ['error', 'something went wrong'];
@@ -167,36 +161,29 @@ class NetworkHandler {
 
   //user preference function
   Future<List<List<String>>> getUserNovels(String token) async {
-    print('get user novel in progress (next: decoded response)');
-    print('token: $token');
     List<List<String>> finalResponse= [];
-    var response = await http.get(Uri.parse("http://ftunebackend.herokuapp.com/api/userposts"),
-        headers: {
-          "Content-type": "application/json",
-          "Authorization": "Bearer $token"
-        });
-    var decodedResponse= json.decode(response.body);
-    print('my novels decoded response: $decodedResponse');
-    if (decodedResponse!=null) {
-      for(int i=0; i<decodedResponse.length; i++) {
-        String novelId= decodedResponse['user_posts'][i]['id'].toString();
-        String novelTitle= decodedResponse['user_posts'][i]['post_body'].toString();
-        String novelImage= decodedResponse['user_posts'][i]['post_attribute_3'].toString();
-        finalResponse.add([novelId, novelTitle, novelImage]);
-      }
-    }
-    String finalResponse0attribute3= finalResponse[0][2];
-    print('final response [0] attribute3: $finalResponse0attribute3 (next: me slide- my novel data)');
-      return finalResponse;
-    /*try {
-
-      } else {
-        return [['0', 'Loading...', RawImageFiles().noData()]];
+    try {
+      var response = await http.get(Uri.parse("http://ftunebackend.herokuapp.com/api/userposts"),
+          headers: {
+            "Content-type": "application/json",
+            "Authorization": "Bearer $token"
+          });
+      var decodedResponse= json.decode(response.body);
+        if (decodedResponse!=null) {
+          for(int i=0; i<decodedResponse.length; i++) {
+            String novelId= decodedResponse['user_posts'][i]['id'].toString();
+            String novelTitle= decodedResponse['user_posts'][i]['post_body'].toString();
+            String novelImage= decodedResponse['user_posts'][i]['post_attribute_3'].toString();
+            finalResponse.add([novelId, novelTitle, novelImage]);
+          }
+          return finalResponse;
+        } else {
+        return [['0', 'error: something went wrong', RawImageFiles().noData()]];
       }
     } catch(e) {
       print(e);
       return [['0', 'error: $e', RawImageFiles().noData()]];
-    }*/
+    }
   }
 
   //login function
@@ -264,8 +251,8 @@ class NetworkHandler {
         saveString('user', 'user_id', response3);
         saveString('user', 'user_attribute', RawImageFiles().userImage());
         String userNumber= zeroString.substring(1, 6- response3.length)+ response3;
-        saveString('user', 'user_userdata', 'user$userNumber*instagram*birthdate');
-        saveString('user', 'user_userbillingdata', '2000*nonpremium');
+        saveString('user', 'user_userdata', 'user$userNumber<divider%54>instagram-account<divider%54>birthdate');
+        saveString('user', 'user_userbillingdata', '2000<divider%54>non-premium');
         return ['success', response1, response2, response3, RawImageFiles().userImage(), 'user$userNumber', '2000'];
       } else if (decodedResponse['message']!=null){
         return ['error', decodedResponse['message'], 'unknown_user', '0', RawImageFiles().userImage(), 'no_data', 'no_data'];

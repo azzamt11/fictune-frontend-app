@@ -30,22 +30,17 @@ class _MeSlideState extends State<MeSlide> {
   }
 
   Future<String> getMyNovelData() async {
-    print('get my novel data in progress (next: get user novels)');
     final String token = widget.responseList[1];
     final List<List<String>> myNovelData= await NetworkHandler().getUserNovels(token);
     String myNovelDataString= '';
-    String myNovelData00= myNovelData[0][0];
-    print('me slide- my novel data [0][0]: $myNovelData00');
     for(int i =0; i<myNovelData.length; i++) {
       myNovelDataString= myNovelDataString+ myNovelData[i][0]+ '<divider%83>'+ myNovelData[i][1] + '<divider%83>'+ myNovelData[i][2]+ '<divider%71>';
     }
-    print('my novel data string: '+ myNovelDataString);
     return myNovelDataString;
   }
 
   @override
   Widget build(BuildContext context) {
-    var size= MediaQuery.of(context).size;
     return Scaffold(
         appBar: AppBar(
             elevation: 0,
@@ -331,7 +326,6 @@ class _MeSlideState extends State<MeSlide> {
   }
 
   List<Widget> novelDirectCard(List<String> novelData) {
-    int novelDataLength= novelData.length;
     var size= MediaQuery.of(context).size;
     List<Widget> widgetList= [];
     for (int i=0; i<max(novelData.length-1, 1); i++) {
@@ -358,9 +352,23 @@ class _MeSlideState extends State<MeSlide> {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(height: 35, width: 150, color: const Color.fromRGBO(245, 245, 245, 1)),
+                          SizedBox(
+                            height: 35,
+                            width: 150,
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: Text(novelData[i].split('<divider%83>')[1].split('<divider%69>')[0], style: TextStyle(fontSize: 18, color: AppTheme.themeColor)),
+                            )
+                          ),
                           const SizedBox(height: 10),
-                          Container(height: 100, width: max(size.width-146, 150), color: const Color.fromRGBO(245, 245, 245, 1)),
+                          SizedBox(
+                              height: 100,
+                              width: max(size.width-146, 150),
+                              child: Align(
+                                alignment: Alignment.topLeft,
+                                child: Text(novelData[i].split('<divider%83>')[1].split('<divider%69>')[1], style: TextStyle(fontSize: 18, color: AppTheme.themeColor)),
+                              )
+                          ),
                         ]
                     )
                 ),
@@ -368,6 +376,10 @@ class _MeSlideState extends State<MeSlide> {
           )
       ));
     }
-    return widgetList;
+    if (widgetList==[]) {
+      return [Container(height: 160, width: size.width, child: Center(child: Text("You have'nt liked any novels")))];
+    } else {
+      return widgetList;
+    }
   }
 }

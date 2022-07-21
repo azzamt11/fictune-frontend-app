@@ -16,8 +16,8 @@ class NovelDataCard extends StatefulWidget {
 }
 
 class _NovelDataCardState extends State<NovelDataCard> {
-  Widget activeWidget1= Text('Loading...', style: TextStyle(fontSize: 18, color: AppTheme.themeColor));
-  Widget activeWidget2= Text('Loading...', style: TextStyle(fontSize: 18, color: AppTheme.themeColor));
+  Widget activeWidget1= Text('Loading...', style: TextStyle(fontSize: 20, color: AppTheme.themeColor));
+  Widget activeWidget2= Text('Loading...', style: TextStyle(fontSize: 17, color: AppTheme.themeColor));
   bool loadingState= true;
 
   @override
@@ -30,7 +30,7 @@ class _NovelDataCardState extends State<NovelDataCard> {
         children: [
           SizedBox(height: 35, width: 150, child: Align(child: activeWidget1, alignment: Alignment.topLeft)),
           const SizedBox(height: 10),
-          SizedBox(height: 100, width: max(size.width-146, 150), child: activeWidget2),
+          SizedBox(height: 100, width: max(size.width-146, 150), child: Align(child: activeWidget2, alignment: Alignment.topLeft)),
         ]
     );
   }
