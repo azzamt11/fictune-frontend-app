@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../helper/AppFunctions.dart';
 import '../helper/AppTheme.dart';
 import '../network_and_data/NetworkHandler.dart';
+import '../pages/NovelPage.dart';
 
 class NovelCard extends StatefulWidget {
   final String genre;
@@ -20,7 +21,13 @@ class NovelCard extends StatefulWidget {
 
 class _NovelCardState extends State<NovelCard> {
   bool loadingState= true;
-  Widget activeWidget= Center(child: Text('Loading...', style: TextStyle(fontSize: 15, color: AppTheme.themeColor)));
+  Widget activeWidget= Container(
+    height: 150,
+    width: 100,
+    color: const Color.fromRGBO(245, 245, 245, 1),
+    child: Center(child: Text('Loading...', style: TextStyle(fontSize: 15, color: AppTheme.themeColor)))
+  );
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -30,34 +37,37 @@ class _NovelCardState extends State<NovelCard> {
   @override
   Widget build(BuildContext context) {
     print('novel card in progress');
-    if (loadingState==true) {setNovelImage(); setState(() {loadingState= false;});}
-    return Container(
-      height: 150,
-      width: 100,
-      color: const Color.fromRGBO(241, 241, 241, 1),
-      child: activeWidget,
-    );
+    if (loadingState==true) {getNovelData(); setState(() {loadingState= false;});}
+    return activeWidget;
   }
 
-  Future<void> setNovelImage() async{
+  Future<void> getNovelData() async{
     String index=widget.index;
     String genre=widget.genre;
     String token=widget.token;
     if (widget.custom==0) {
       List<String> novelDataArray= await NetworkHandler().getLatestPostsByGenre(genre, index, token);
-      final novelTitle= novelDataArray[1];
-      final novelImage= novelDataArray[2];
-      NetworkHandler().saveString('user', 'novels_titles_$index', novelTitle);
-      NetworkHandler().saveString('user', 'novels_images_$index', novelImage);
+      final novelId= novelDataArray[1];
+      final novelTitle= novelDataArray[2];
+      final novelImage= novelDataArray[3];
+      String novelDataString= novelId+'<divider%83>'+novelTitle+'<divider%83>'+novelImage;
+      NetworkHandler().saveString('user', 'novelData$novelId', novelDataString);
+      print('step_013: novel data string has been saved with key: novelData$novelId');
       setState(() {
-        activeWidget= Container(
-            height: 150,
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                  fit: BoxFit.cover,
-                  image: MemoryImage(AppFunctions().convertBase64Image(novelImage)),
-                )
-            )
+        activeWidget= GestureDetector(
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context)=> NovelPage(token: token, novelId: novelId)));
+          },
+          child: Container(
+              height: 150,
+              width: 100,
+              decoration: BoxDecoration(
+                  image: DecorationImage(
+                    fit: BoxFit.cover,
+                    image: MemoryImage(AppFunctions().convertBase64Image(novelImage)),
+                  )
+              )
+          ),
         );
       });
     }

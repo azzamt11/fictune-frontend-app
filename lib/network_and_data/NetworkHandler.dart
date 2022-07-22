@@ -36,11 +36,12 @@ class NetworkHandler {
         );
       }
       var decodedResponse= json.decode(response.body);
+      var id= decodedResponse['posts']['id'].toString();
       var title= decodedResponse['posts']['post_body'].toString();
       var image= decodedResponse['posts']['post_attribute_3'].toString();
-      return ['success', title, image];
+      return ['success', id, title, image];
     } catch(e) {
-      return ['error', 'something went wrong :<divider%69>$e', noData];
+      return ['error', '0', 'something went wrong :<divider%69>$e', noData];
     }
   }
 
@@ -52,15 +53,19 @@ class NetworkHandler {
             "Authorization": "Bearer $token"
           });
       var decodedResponse= json.decode(response.body);
-      if (decodedResponse['post']!=null || decodedResponse['posts']!='') {
+      if (decodedResponse['post']!=null && decodedResponse['posts']!='[]') {
         String response1= decodedResponse['post'][0]['post_body'].toString();
         String response2= decodedResponse['post'][0]['post_attribute_3'].toString();
-        return ['success', response1, response2];
+        String response3= decodedResponse['post'][0]['post_attribute_1'].toString();
+        String response4= decodedResponse['post'][0]['post_attribute_2'].toString();
+        return ['success', response1, response2, response3, response4];
+      } else if (decodedResponse['posts']!='[]') {
+        return ['zero', 'error<divider%69>error', 'error', 'error', 'error'];
       } else {
-        return ['error', 'error<divider%69>error', 'error'];
+        return ['error', 'error<divider%69>error', 'error', 'error', 'error'];
       }
     } catch(e) {
-      return ['error', 'error<divider%69>error', 'error'];
+      return ['error', 'error<divider%69>error', 'error', 'error', 'error'];
     }
   }
 

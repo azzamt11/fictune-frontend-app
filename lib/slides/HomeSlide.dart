@@ -121,12 +121,7 @@ class _HomeSlideState extends State<HomeSlide> {
     String token= responseList[1];
     String userId= responseList[3];
     List<String> novelData= [token, userId, '$genre', '$index'];
-    return GestureDetector(
-        onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context)=> NovelPage(novelData: novelData)));
-        },
-        child: NovelCard(userId: userId, genre: '$genre', index: '$index', token: token, custom: 0),
-    );
+    return NovelCard(userId: userId, genre: '$genre', index: '$index', token: token, custom: 0);
   }
 
   //novel card widget

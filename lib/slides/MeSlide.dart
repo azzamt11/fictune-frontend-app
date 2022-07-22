@@ -4,7 +4,6 @@ import 'package:fictune_frontend/network_and_data/NetworkHandler.dart';
 import 'package:flutter/material.dart';
 
 import '../components/NovelDirectCard.dart';
-import '../files/RawImageFiles.dart';
 import '../helper/AppFunctions.dart';
 import '../helper/AppTheme.dart';
 
@@ -30,7 +29,7 @@ class _MeSlideState extends State<MeSlide> {
     String? userLikedNovelsIndices= await NetworkHandler().getString('user', key0);
     if (userLikedNovelsIndices!=null && userLikedNovelsIndices!='zero') {
       List<String> userLikedNovelIndexList= userLikedNovelsIndices.split('%');
-      for (int i=0; i<userLikedNovelIndexList.length; i++) {
+      for (int i=0; i<max(userLikedNovelIndexList.length-1, 1); i++) {
         String key= 'novelData'+userLikedNovelIndexList[i];
         print('step_006 (on MeSlide): iteration $i getting file with key: $key');
         String? novelDataForIthIteration= await NetworkHandler().getString('user', key);
@@ -71,7 +70,7 @@ class _MeSlideState extends State<MeSlide> {
               GestureDetector(
                   child: const Icon(Icons.more_vert),
                   onTap: () {
-                    // a certain action will be added here
+                    // a certain action will be added here.
                   }
               )
             ]

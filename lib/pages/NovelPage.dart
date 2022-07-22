@@ -1,5 +1,4 @@
 import 'package:fictune_frontend/files/RawImageFiles.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../helper/AppFunctions.dart';
@@ -7,39 +6,42 @@ import '../helper/AppTheme.dart';
 import '../network_and_data/NetworkHandler.dart';
 
 class NovelPage extends StatefulWidget {
-  final List<String> novelData;
-  const NovelPage({Key? key, required this.novelData}) : super(key: key);
+  final String token;
+  final String novelId;
+  const NovelPage({Key? key, required this.novelId, required this.token}) : super(key: key);
 
   @override
   State<NovelPage> createState() => _NovelPageState();
 }
 
 class _NovelPageState extends State<NovelPage> {
-  bool imageLoading= true;
-  bool titleLoading= true;
+  String author= 'Loading...';
+  String rate= 'Loading...';
+  bool fixedLoading=true;
+  bool loading=true;
+  bool detailLoading=true;
   bool novelDataHasBeenLoadedFromNetwork= false;
-  String novelTitle= 'Loading...<divider%69>loading...<divider%69>';
-  String novelImage= RawImageFiles().noImage();
+  List<String> novelData= ['0', 'Loading...<divider%69>Loading...', RawImageFiles().noData()];
 
   @override
   Widget build(BuildContext context) {
-    setNovelImage();
+    if (loading) {getNovelData(); getNovelDetail(); loading=false; detailLoading=false;}
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70),
         child: AppBar(
-          backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
+          backgroundColor: const Color.fromRGBO(230, 230, 230, 1),
           centerTitle: true,
-          title: Text(novelTitle.split('<divider%69>')[0], style: TextStyle(fontSize: 18, color: AppTheme.themeColor)),
+          title: Text(novelData[1].split('<divider%69>')[0], style: const TextStyle(fontSize: 18, color: Colors.white)),
           elevation: 0,
 
         ),
       ),
-      body: getBody(imageLoading, titleLoading),
+      body: getBody(loading),
     );
   }
 
-  Widget getBody(bool imageLoading, bool titleLoading) {
+  Widget getBody(loading) {
     var size= MediaQuery.of(context).size;
     return SizedBox(
       height: size.height- 70,
@@ -56,7 +58,7 @@ class _NovelPageState extends State<NovelPage> {
                   width: 0.33*size.width,
                   child: Container(
                     padding: const EdgeInsets.only(left: 20, top: 10, bottom: 10),
-                    child: getNovelMainContainer(imageLoading),
+                    child: getNovelMainContainer(loading),
                   ),
                 ),
                 Container(
@@ -67,12 +69,14 @@ class _NovelPageState extends State<NovelPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        getNovelTitleContainer(titleLoading, 0, 20, 'Title', 35, 150, true),
+                        getNovelTitleContainer(loading, 0, 20, 'Title', 45, 150, true),
+                        const SizedBox(height: 18),
+                        getNovelAuthorContainer(fixedLoading, 18, 'Author', 28, 0.67*size.width-40),
+                        const SizedBox(height: 2),
+                        getNovelRatingContainer(detailLoading, 27, 0.67*size.width-40),
                         const SizedBox(height: 12),
-                        getNovelTitleContainer(titleLoading, 1, 18, 'Synopsys', 90, 0.67*size.width-40, false),
-                        const SizedBox(height: 13),
                         Container(
-                          height: 30,
+                          height: 40,
                           width: 110,
                           decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: AppTheme.themeColor),
                           child: const Center(
@@ -112,38 +116,29 @@ class _NovelPageState extends State<NovelPage> {
     );
   }
 
-  Future<void> setNovelImage() async{
-    String index= widget.novelData[3];
-    String? novelImageFromDevice= await NetworkHandler().getString('user', 'novels_images_$index');
-    if (novelImageFromDevice!=null) {
-      setState(() {
-        novelImage= novelImageFromDevice;
-        imageLoading=false;
-      });
-    } else {
-      List<String> novelDataFromNetwork= await NetworkHandler().getPostById(widget.novelData[0], widget.novelData[1]);
-      if (novelDataFromNetwork[0]=='success') {
+  Future<void> getNovelData() async{
+    String novelId= widget.novelId;
+    if (novelId!='0') {
+      print('step_014 (novel page): get novel data with key: novelData$novelId. Output: ');
+      String? novelDataString= await NetworkHandler().getString('user', 'novelData$novelId');
+      print(novelDataString);
+      if (novelDataString!=null) {
         setState(() {
-          novelImage= novelDataFromNetwork[2];
-          novelTitle= novelDataFromNetwork[1];
-          imageLoading=false;
-          titleLoading=false;
-          novelDataHasBeenLoadedFromNetwork= true;
+          novelData= novelDataString.split('<divider%83>');
+          loading=false;
         });
       }
     }
-    if (titleLoading) {
-      String? novelTitleFromDevice= await NetworkHandler().getString('user', 'novels_titles_$index');
-      if (novelTitleFromDevice!=null) {
+  }
+
+  Future<void> getNovelDetail() async{
+    String novelId= widget.novelId;
+    if (novelId!='0') {
+      List<String> novelDetailData= await NetworkHandler().getPostById(widget.token, novelId);
+      if (novelDetailData!=[]) {
         setState(() {
-          novelTitle= novelTitleFromDevice;
-          titleLoading=false;
-        });
-      } else {
-        List<String> novelDataFromNetwork= await NetworkHandler().getPostById(widget.novelData[0], widget.novelData[1]);
-        setState(() {
-          novelTitle= novelDataFromNetwork[1];
-          titleLoading=false;
+          rate= novelDetailData[3];
+          detailLoading=false;
         });
       }
     }
@@ -163,7 +158,7 @@ class _NovelPageState extends State<NovelPage> {
       return Container(
         height: 180,
         width: 120,
-        decoration: BoxDecoration(image: DecorationImage(image: MemoryImage(AppFunctions().convertBase64Image(novelImage)))),
+        decoration: BoxDecoration(image: DecorationImage(fit: BoxFit.cover, image: MemoryImage(AppFunctions().convertBase64Image(novelData[2])))),
       );
     }
   }
@@ -176,16 +171,68 @@ class _NovelPageState extends State<NovelPage> {
         color: const Color.fromRGBO(245, 245, 245, 1),
       );
     } else {
-      print('novel TITLE: '+ novelTitle);
-      return Container(
+      return SizedBox(
         height: height,
         width: width,
         child: Align(
           alignment: Alignment.topLeft,
-          child: Text('$text: '+ novelTitle.split('<divider%69>')[index], style: TextStyle(fontSize: fontSize, color: AppTheme.themeColor, fontWeight: bold? FontWeight.bold : FontWeight.normal)),
+          child: Text('$text: '+ novelData[1].split('<divider%69>')[index], style: TextStyle(fontSize: fontSize, color: AppTheme.themeColor, fontWeight: bold? FontWeight.bold : FontWeight.normal)),
         ),
       );
     }
+  }
 
+  Widget getNovelRatingContainer(bool titleLoading, double height, double width) {
+    if (detailLoading) {
+      return Container(
+        height: height,
+        width: width,
+        color: const Color.fromRGBO(245, 245, 245, 1),
+      );
+    } else {
+      return SizedBox(
+        height: height,
+        width: width,
+        child: Align(
+          alignment: Alignment.topLeft,
+          child: Row(
+            children: [Text('Rating: '+ rate, style: TextStyle(fontSize: 18, color: AppTheme.themeColor))],
+          ),
+        ),
+      );
+    }
+  }
+
+  Widget getNovelAuthorContainer(bool loading, double fontSize, String text, double height, double width) {
+    if (detailLoading) {
+      return Container(
+        height: height,
+        width: width,
+        color: const Color.fromRGBO(245, 245, 245, 1),
+      );
+    } else {
+      return SizedBox(
+        height: height,
+        width: width,
+        child: Align(
+          alignment: Alignment.topLeft,
+          child:Text(author, style: TextStyle(fontSize: fontSize, color: AppTheme.themeColor, fontWeight: FontWeight.normal)),
+        ),
+      );
+    }
+  }
+
+  List<Widget> getStar(int rate) {
+    List<Widget> stars= [];
+    for (int i=0; i<rate; i++) {
+      stars.add(const Icon(Icons.star, size: 20, color: Colors.amber));
+    }
+    return stars;
+  }
+
+  Future<void> getAuthor(index) async{
+    setState(() {
+
+    });
   }
 }
