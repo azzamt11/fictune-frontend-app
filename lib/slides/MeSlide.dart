@@ -28,10 +28,10 @@ class _MeSlideState extends State<MeSlide> {
     print('step_005 (on MeSlide): get favorite noval data in progress');
     String key0= 'userLikedNovelsIndices';
     String? userLikedNovelsIndices= await NetworkHandler().getString('user', key0);
-    if (userLikedNovelsIndices!=null) {
+    if (userLikedNovelsIndices!=null && userLikedNovelsIndices!='zero') {
       List<String> userLikedNovelIndexList= userLikedNovelsIndices.split('%');
       for (int i=0; i<userLikedNovelIndexList.length; i++) {
-        String key= 'liked_novel_data_'+userLikedNovelIndexList[i];
+        String key= 'novelData'+userLikedNovelIndexList[i];
         print('step_006 (on MeSlide): iteration $i getting file with key: $key');
         String? novelDataForIthIteration= await NetworkHandler().getString('user', key);
         if (novelDataForIthIteration!=null) {
@@ -43,6 +43,8 @@ class _MeSlideState extends State<MeSlide> {
       }
       print('step_008 (on MeSlide): novel Data has been fulfilled, returning the data');
       return novelData;
+    } else if (userLikedNovelsIndices!=null && userLikedNovelsIndices=='zero') {
+      return 'zero';
     } else {
       print('step_006b (on MeSlide): indices not found. Returning null string');
       return novelData;
@@ -51,13 +53,12 @@ class _MeSlideState extends State<MeSlide> {
   }
 
   Future<String> getMyNovelData() async {
-    final String token = widget.responseList[1];
-    final List<List<String>> myNovelData= await NetworkHandler().getUserNovels(token);
-    String myNovelDataString= '';
-    for(int i =0; i<myNovelData.length; i++) {
-      myNovelDataString= myNovelDataString+ myNovelData[i][0]+ '<divider%83>'+ myNovelData[i][1] + '<divider%83>'+ myNovelData[i][2]+ '<divider%71>';
+    final String? myNovelData= await NetworkHandler().getString('user', 'myNovelData');
+    if (myNovelData!=null) {
+      return myNovelData;
+    } else {
+      return 'error';
     }
-    return myNovelDataString;
   }
 
   @override
@@ -239,15 +240,34 @@ class _MeSlideState extends State<MeSlide> {
   }
 
   Widget getMyNovelsList() {
+    var size= MediaQuery.of(context).size;
     return FutureBuilder(
       future: getMyNovelData(),
       builder: (context, snapshot) {
-        if (snapshot.hasData && myNovelLoadingState) {
+        if (snapshot.hasData) {
           String myNovelDataString= snapshot.data.toString();
-          List<String> myNovelData= myNovelDataString.split('<divider%71>');
-          return Column(
-            children: novelDirectCard(myNovelData, false),
-          );
+          if (myNovelDataString!='zero' && myNovelDataString!='error') {
+            List<String> myNovelData= myNovelDataString.split('<divider%71>');
+            return Column(
+              children: novelDirectCard(myNovelData, true),
+            );
+          } else if (myNovelDataString=='zero') {
+            return Column(
+              children: [SizedBox(
+                height: 100,
+                width: size.width,
+                child: Center(child: Text("You have not made any novels yet", style: TextStyle(fontSize: 18, color: AppTheme.themeColor))),
+              )],
+            );
+          } else {
+            return Column(
+              children: [SizedBox(
+                height: 100,
+                width: size.width,
+                child: Center(child: Text("Network Error", style: TextStyle(fontSize: 18, color: AppTheme.themeColor))),
+              )],
+            );
+          }
         } else {
           return Column(
             children: widgetList(['0', '0', '0', '0'],false),
@@ -258,16 +278,29 @@ class _MeSlideState extends State<MeSlide> {
   }
 
   Widget getFavoriteNovelsList() {
+    var size= MediaQuery.of(context).size;
     return FutureBuilder(
       future: getFavoriteNovelData(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           print('step_009: snapshot has data');
           String favoriteNovelDataString= snapshot.data.toString();
-          if (favoriteNovelDataString=='notfound') {
-            print('step_010: novel data string notfound, returning null widget list');
+          if (favoriteNovelDataString=='zero') {
+            print('step_010: novel data string zero, returning You-have-not-liked-any-novels-yet-single-widget widget list');
             return Column(
-                children: widgetList(['0', '0', '0', '0'],false),
+                children: [SizedBox(
+                  height: 100,
+                  width: size.width,
+                  child: Center(child: Text("You have not liked any novels yet", style: TextStyle(fontSize: 18, color: AppTheme.themeColor))),
+                )],
+            );
+          } else if (favoriteNovelDataString=='') {
+            return Column(
+              children: [SizedBox(
+                height: 100,
+                width: size.width,
+                child: Center(child: Text("Network Error", style: TextStyle(fontSize: 18, color: AppTheme.themeColor))),
+              )],
             );
           } else {
             print('step_010: novel data string found, separating the novel data with separator <divider%71>');

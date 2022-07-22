@@ -93,9 +93,13 @@ class NetworkHandler {
         });
     var decodedResponse= json.decode(response.body);
     if (decodedResponse!=null) {
-      String response= decodedResponse['user_attribute_2'].toString();
-      String finalResponse= response.split('<divider%39>')[0];
-      return ['success', finalResponse];
+      String responseString= decodedResponse['user_attribute_2'].toString();
+      if (responseString=='') {
+        return ['zero', ''];
+      } else {
+        String finalResponse= responseString.split('<divider%39>')[0];
+        return ['success', finalResponse];
+      }
     } else {
       return ['error', 'error'];
     }
@@ -112,11 +116,15 @@ class NetworkHandler {
           });
       var decodedResponse= json.decode(response.body);
         if (decodedResponse!=null) {
-          for(int i=0; i<decodedResponse.length; i++) {
-            String novelId= decodedResponse['user_posts'][i]['id'].toString();
-            String novelTitle= decodedResponse['user_posts'][i]['post_body'].toString();
-            String novelImage= decodedResponse['user_posts'][i]['post_attribute_3'].toString();
-            finalResponse.add(['success', novelId, novelTitle, novelImage]);
+          if (decodedResponse['user_posts'].length!=0) {
+            for(int i=0; i<decodedResponse.length; i++) {
+              String novelId= decodedResponse['user_posts'][i]['id'].toString();
+              String novelTitle= decodedResponse['user_posts'][i]['post_body'].toString();
+              String novelImage= decodedResponse['user_posts'][i]['post_attribute_3'].toString();
+              finalResponse.add(['success', novelId, novelTitle, novelImage]);
+            }
+          } else {
+            finalResponse.add(['zero', '0', 'error<divider%69>error', 'error']);
           }
           return finalResponse;
         } else {
