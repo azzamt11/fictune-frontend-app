@@ -29,7 +29,7 @@ class _NovelCardState extends State<NovelCard> {
   //scaffold
   @override
   Widget build(BuildContext context) {
-    print('novel card in progress (next: set novel image)');
+    print('novel card in progress');
     if (loadingState==true) {setNovelImage(); setState(() {loadingState= false;});}
     return Container(
       height: 150,

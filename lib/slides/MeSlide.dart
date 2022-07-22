@@ -3,9 +3,8 @@ import 'dart:math';
 import 'package:fictune_frontend/network_and_data/NetworkHandler.dart';
 import 'package:flutter/material.dart';
 
-import '../components/NovelCard.dart';
-import '../components/NovelDataCard.dart';
 import '../components/NovelDirectCard.dart';
+import '../files/RawImageFiles.dart';
 import '../helper/AppFunctions.dart';
 import '../helper/AppTheme.dart';
 
@@ -25,13 +24,30 @@ class _MeSlideState extends State<MeSlide> {
   int activeSubWidget= 0;
 
   Future<String> getFavoriteNovelData() async {
-    final String token = widget.responseList[1];
-    final List<List<String>> favoriteNovelData= await NetworkHandler().getUserLikedNovels(token);
-    String favoriteNovelDataString= '';
-    for(int i =0; i<favoriteNovelData.length; i++) {
-      favoriteNovelDataString= favoriteNovelDataString+ favoriteNovelData[i][0]+ '<divider%83>'+ favoriteNovelData[i][1] + '<divider%83>'+ favoriteNovelData[i][2]+ '<divider%71>';
+    String novelData= '';
+    print('step_005 (on MeSlide): get favorite noval data in progress');
+    String key0= 'userLikedNovelsIndices';
+    String? userLikedNovelsIndices= await NetworkHandler().getString('user', key0);
+    if (userLikedNovelsIndices!=null) {
+      List<String> userLikedNovelIndexList= userLikedNovelsIndices.split('%');
+      for (int i=0; i<userLikedNovelIndexList.length; i++) {
+        String key= 'liked_novel_data_'+userLikedNovelIndexList[i];
+        print('step_006 (on MeSlide): iteration $i getting file with key: $key');
+        String? novelDataForIthIteration= await NetworkHandler().getString('user', key);
+        if (novelDataForIthIteration!=null) {
+          print('step_007 (on MeSlide): novel data for iteration $i for key: $key is found, insert to novelData with separator <divider%71>...');
+          novelData= novelData+ novelDataForIthIteration + '<divider%71>';
+        } else {
+          print('step_007b (on MeSlide): novel data for iteration $i for key: $key is not found. continue to the next iteration');
+        }
+      }
+      print('step_008 (on MeSlide): novel Data has been fulfilled, returning the data');
+      return novelData;
+    } else {
+      print('step_006b (on MeSlide): indices not found. Returning null string');
+      return novelData;
     }
-    return favoriteNovelDataString;
+
   }
 
   Future<String> getMyNovelData() async {
@@ -242,18 +258,27 @@ class _MeSlideState extends State<MeSlide> {
   }
 
   Widget getFavoriteNovelsList() {
-    print('get my novels list in progress (next: get favorite novel data)');
     return FutureBuilder(
       future: getFavoriteNovelData(),
       builder: (context, snapshot) {
-        if (snapshot.hasData && favoriteNovelLoadingState) {
-          print('snapshot has data on favorite novels list: true');
+        if (snapshot.hasData) {
+          print('step_009: snapshot has data');
           String favoriteNovelDataString= snapshot.data.toString();
-          List<String> favoriteNovelData= favoriteNovelDataString.split('<divider%71>');
-          print('(next: novel direct card widget) favorite novel data string: '+ favoriteNovelDataString);
-          return Column(
-            children: novelDirectCard(favoriteNovelData, true),
-          );
+          if (favoriteNovelDataString=='notfound') {
+            print('step_010: novel data string notfound, returning null widget list');
+            return Column(
+                children: widgetList(['0', '0', '0', '0'],false),
+            );
+          } else {
+            print('step_010: novel data string found, separating the novel data with separator <divider%71>');
+            String secondElementsOnCheck= favoriteNovelDataString[1];
+            print('the second element after separating with <divider%71> is: $secondElementsOnCheck');
+            List<String> favoriteNovelData= favoriteNovelDataString.split('<divider%71>');
+            print('step_011: returning the novel Direct Card with the data');
+            return Column(
+              children: novelDirectCard(favoriteNovelData, true),
+            );
+          }
         } else {
           return Column(
             children: widgetList(['0', '0', '0', '0'],false),
@@ -264,7 +289,6 @@ class _MeSlideState extends State<MeSlide> {
   }
 
   List<Widget> widgetList(List<String> novelsList, bool loaded) {
-    print('widget list in progress (next: build card)');
     var size= MediaQuery.of(context).size;
     List<Widget> widgetList= [];
     for (int i=0; i<novelsList.length; i++) {
@@ -305,8 +329,8 @@ class _MeSlideState extends State<MeSlide> {
   List<Widget> novelDirectCard(List<String> novelData, bool isFavoriteNovel) {
     var size= MediaQuery.of(context).size;
     List<Widget> widgetList= [];
-    print('my novel loading state : $myNovelLoadingState,  favorite novel loading state : $favoriteNovelLoadingState');
     for (int i=0; i<max(novelData.length-1, 1); i++) {
+      String novelDatai= novelData[i];
       widgetList.add(Container(
           height: 160,
           width: size.width,

@@ -45,27 +45,6 @@ class NetworkHandler {
   }
 
   //get latest post by secondary attribute function
-  Future<List<String>> getFavoritePost(String token, String index) async{
-    try {
-      var response= await http.get(Uri.parse('http://ftunebackend.herokuapp.com/api/posts/liked/$index'),
-          headers: {"Content-type": "application/json",
-            "Authorization": "Bearer $token"
-          });
-      var decodedResponse= json.decode(response.body);
-      if (decodedResponse['posts']!=null || decodedResponse['posts']!='') {
-        String response1= decodedResponse['posts'][0]['post_body'].toString();
-        String response2= decodedResponse['posts'][0]['post_attribute_3'].toString();
-        return [response1, response2];
-      } else {
-        return ['error', RawImageFiles().noImage(), 'something went wrong'];
-      }
-    } catch(e) {
-      print(e);
-      return ['error', RawImageFiles().noImage(), 'error: $e'];
-    }
-  }
-
-  //get latest post by secondary attribute function
   Future<List<String>> getPostById(String token, String id) async{
     try {
       var response= await http.get(Uri.parse('http://ftunebackend.herokuapp.com/api/posts/$id'),
@@ -78,10 +57,10 @@ class NetworkHandler {
         String response2= decodedResponse['post'][0]['post_attribute_3'].toString();
         return ['success', response1, response2];
       } else {
-        return ['error', 'error<divider%69>something went wrong', RawImageFiles().noImage()];
+        return ['error', 'error<divider%69>error', 'error'];
       }
     } catch(e) {
-      return ['error', 'error<divider%69>something went wrong: $e', RawImageFiles().noImage()];
+      return ['error', 'error<divider%69>error', 'error'];
     }
   }
 
@@ -101,45 +80,8 @@ class NetworkHandler {
       }
       return novelResponseList;
     } else {
-      return [['error', 'error', RawImageFiles().noImage()]];
+      return [['error', 'error<divider%69>error', 'error']];
     }
-  }
-
-  //post function
-  Future<http.Response> post(String url, Map<String, String> body) async {
-    var token= getString('user', 'token');
-    log.d(body);
-    var response = await http.post(Uri.parse("http://ftunebackend.herokuapp.com/api/$url"), headers: {
-        "Content-type": "application/json",
-        "Authorization": "Bearer $token"
-      },
-      body: json.encode(body),
-    );
-    return response;
-  }
-
-  //put function
-  Future<http.Response> put(String url, Map<String, String> body) async {
-    var token= getString('user', 'token');
-    log.d(body);
-    var response = await http.put(Uri.parse("http://ftunebackend.herokuapp.com/api/$url"), headers: {
-        "Content-type": "application/json",
-        "Authorization": "Bearer $token"
-      },
-      body: json.encode(body),
-    );
-    return response;
-  }
-
-  //delete function
-  Future<http.Response> delete(String url) async {
-    var token= getString('user', 'token');
-    var response = await http.delete(Uri.parse("http://ftunebackend.herokuapp.com/api/$url"), headers: {
-      "Content-type": "application/json",
-      "Authorization": "Bearer $token",
-      "Access-Control-Allow-Origin": "*"
-    });
-    return response;
   }
 
   //user preference function
@@ -155,7 +97,7 @@ class NetworkHandler {
       String finalResponse= response.split('<divider%39>')[0];
       return ['success', finalResponse];
     } else {
-      return ['error', 'something went wrong'];
+      return ['error', 'error'];
     }
   }
 
@@ -174,15 +116,15 @@ class NetworkHandler {
             String novelId= decodedResponse['user_posts'][i]['id'].toString();
             String novelTitle= decodedResponse['user_posts'][i]['post_body'].toString();
             String novelImage= decodedResponse['user_posts'][i]['post_attribute_3'].toString();
-            finalResponse.add([novelId, novelTitle, novelImage]);
+            finalResponse.add(['success', novelId, novelTitle, novelImage]);
           }
           return finalResponse;
         } else {
-        return [['0', 'error<divider%69>something went wrong', RawImageFiles().noData()]];
+        return [['error', '0', 'error<divider%69>error', 'error']];
       }
     } catch(e) {
       print(e);
-      return [['0', 'error<divider%69>$e', RawImageFiles().noData()]];
+      return [['error', '0', 'error<divider%69>error', 'error']];
     }
   }
 
@@ -205,11 +147,11 @@ class NetworkHandler {
         }
         return finalResponse;
       } else {
-        return [['0', 'error<divider%69>something went wrong', RawImageFiles().noData()]];
+        return [['0', 'error<divider%69>error', 'error']];
       }
     } catch(e) {
       print(e);
-      return [['0', 'error<divider%69>$e', RawImageFiles().noData()]];
+      return [['0', 'error<divider%69>error', 'error']];
     }
   }
 
@@ -291,7 +233,44 @@ class NetworkHandler {
     }//updated
   }
 
-  //required sub-functions
+  //required sub-functions:
+  //post function
+  Future<http.Response> post(String url, Map<String, String> body) async {
+    var token= getString('user', 'token');
+    log.d(body);
+    var response = await http.post(Uri.parse("http://ftunebackend.herokuapp.com/api/$url"), headers: {
+      "Content-type": "application/json",
+      "Authorization": "Bearer $token"
+    },
+      body: json.encode(body),
+    );
+    return response;
+  }
+
+  //put function
+  Future<http.Response> put(String url, Map<String, String> body) async {
+    var token= getString('user', 'token');
+    log.d(body);
+    var response = await http.put(Uri.parse("http://ftunebackend.herokuapp.com/api/$url"), headers: {
+      "Content-type": "application/json",
+      "Authorization": "Bearer $token"
+    },
+      body: json.encode(body),
+    );
+    return response;
+  }
+
+  //delete function
+  Future<http.Response> delete(String url) async {
+    var token= getString('user', 'token');
+    var response = await http.delete(Uri.parse("http://ftunebackend.herokuapp.com/api/$url"), headers: {
+      "Content-type": "application/json",
+      "Authorization": "Bearer $token",
+      "Access-Control-Allow-Origin": "*"
+    });
+    return response;
+  }
+
   void saveString(String userId, String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_generateKey(userId, key), value);

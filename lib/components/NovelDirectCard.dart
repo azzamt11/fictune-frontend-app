@@ -19,9 +19,9 @@ class _NovelDirectCardState extends State<NovelDirectCard> {
 
   @override
   Widget build(BuildContext context) {
-    print('novel Direct card in progress (next: novel image)');
+    String novelDataToPrint= widget.novelData;
+    print('step_012: Novel direct card is in progress on data: $novelDataToPrint');
     String novelImage= widget.novelData.split('<divider%83>')[2];
-    print('novel image: $novelImage');
     return Container(
       height: 150,
       width: 100,
