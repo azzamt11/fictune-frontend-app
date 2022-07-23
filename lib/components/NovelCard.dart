@@ -37,7 +37,7 @@ class _NovelCardState extends State<NovelCard> {
   @override
   Widget build(BuildContext context) {
     print('novel card in progress');
-    if (loadingState==true) {getNovelData(); setState(() {loadingState= false;});}
+    if (loadingState==true) {setState(() {loadingState= false;}); getNovelData();}
     return activeWidget;
   }
 
@@ -47,29 +47,37 @@ class _NovelCardState extends State<NovelCard> {
     String token=widget.token;
     if (widget.custom==0) {
       List<String> novelDataArray= await NetworkHandler().getLatestPostsByGenre(genre, index, token);
-      final novelId= novelDataArray[1];
-      final novelTitle= novelDataArray[2];
-      final novelImage= novelDataArray[3];
-      String novelDataString= novelId+'<divider%83>'+novelTitle+'<divider%83>'+novelImage;
-      NetworkHandler().saveString('user', 'novelData$novelId', novelDataString);
-      print('step_013: novel data string has been saved with key: novelData$novelId');
-      setState(() {
-        activeWidget= GestureDetector(
-          onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context)=> NovelPage(token: token, novelId: novelId)));
-          },
-          child: Container(
-              height: 150,
-              width: 100,
-              decoration: BoxDecoration(
-                  image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: MemoryImage(AppFunctions().convertBase64Image(novelImage)),
-                  )
-              )
-          ),
-        );
-      });
+      if (novelDataArray[0]=='success') {
+        final novelId= novelDataArray[1];
+        final novelTitle= novelDataArray[2];
+        final novelImage= novelDataArray[3];
+        final novelRate= novelDataArray[4];
+        final novelGenre= novelDataArray[5];
+        final novelAuthorId= novelDataArray[6];
+        String novelDataString= novelId+'<divider%83>'+novelTitle+'<divider%83>'+novelImage+ '<divider%83>'+ novelRate+ '<divider%83'+ novelGenre + '<divider%83'+ novelAuthorId;
+        NetworkHandler().saveString('user', 'novelData$novelId', novelDataString);
+        print('step_013: novel data string has been saved with key: novelData$novelId');
+        setState(() {
+          activeWidget= GestureDetector(
+            onTap: () {
+              print('step_014: navigating to Novel Page with token : $token, novelId: $novelId');
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> NovelPage(token: token, novelId: novelId)));
+            },
+            child: Container(
+                height: 150,
+                width: 100,
+                decoration: BoxDecoration(
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: MemoryImage(AppFunctions().convertBase64Image(novelImage)),
+                    )
+                )
+            ),
+          );
+        });
+      } else {
+        setState(() {loadingState=true;});
+      }
     }
 
   }

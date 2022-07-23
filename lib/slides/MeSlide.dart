@@ -23,21 +23,34 @@ class _MeSlideState extends State<MeSlide> {
   int activeSubWidget= 0;
 
   Future<String> getFavoriteNovelData() async {
+    String token= widget.responseList[1];
     String novelData= '';
-    print('step_005 (on MeSlide): get favorite noval data in progress');
+    String userLikedNovelsIndices;
+    print('step_005 (on MeSlide): get favorite novel data in progress');
     String key0= 'userLikedNovelsIndices';
-    String? userLikedNovelsIndices= await NetworkHandler().getString('user', key0);
-    if (userLikedNovelsIndices!=null && userLikedNovelsIndices!='zero') {
+    String? userLikedNovelsIndicesFromStorage= await NetworkHandler().getString('user', key0);
+    if (userLikedNovelsIndicesFromStorage==null) {
+      List<String> userLikedNovelsIndicesArray= await NetworkHandler().getUserLikedNovelIndices(token);
+      userLikedNovelsIndices= userLikedNovelsIndicesArray[1];
+    } else {
+      userLikedNovelsIndices= userLikedNovelsIndicesFromStorage;
+    }
+    if (userLikedNovelsIndices!='error' && userLikedNovelsIndices!='zero') {
       List<String> userLikedNovelIndexList= userLikedNovelsIndices.split('%');
       for (int i=0; i<max(userLikedNovelIndexList.length-1, 1); i++) {
-        String key= 'novelData'+userLikedNovelIndexList[i];
-        print('step_006 (on MeSlide): iteration $i getting file with key: $key');
-        String? novelDataForIthIteration= await NetworkHandler().getString('user', key);
-        if (novelDataForIthIteration!=null) {
-          print('step_007 (on MeSlide): novel data for iteration $i for key: $key is found, insert to novelData with separator <divider%71>...');
-          novelData= novelData+ novelDataForIthIteration + '<divider%71>';
+        if (userLikedNovelIndexList[i]!='null') {
+          String key= 'novelData'+userLikedNovelIndexList[i];
+          print('step_006 (on MeSlide): iteration $i getting file with key: $key');
+          String? novelDataForIthIteration= await NetworkHandler().getString('user', key);
+          if (novelDataForIthIteration!=null) {
+            print('step_007 (on MeSlide): novel data for iteration $i for key: $key is found, insert to novelData with separator <divider%71>...');
+            novelData= novelData+ novelDataForIthIteration + '<divider%71>';
+          } else {
+            print('step_007b (on MeSlide): novel data for iteration $i for key: $key is not found. continue to the next iteration');
+          }
         } else {
-          print('step_007b (on MeSlide): novel data for iteration $i for key: $key is not found. continue to the next iteration');
+          print('step_006 (interrupted): userLikedNovelIndexList[i]==null');
+          return 'zero';
         }
       }
       print('step_008 (on MeSlide): novel Data has been fulfilled, returning the data');
@@ -52,11 +65,25 @@ class _MeSlideState extends State<MeSlide> {
   }
 
   Future<String> getMyNovelData() async {
-    final String? myNovelData= await NetworkHandler().getString('user', 'myNovelData');
-    if (myNovelData!=null) {
+    String myNovelData= '';
+    final String? myNovelDataString= await NetworkHandler().getString('user', 'myNovelData');
+    if (myNovelDataString==null) {
+      print('step_015: my novel data is null, progress to network get user novels');
+      List<List<String>> myNovelDataArrayArray= await NetworkHandler().getUserNovels(widget.responseList[1]);
+      String myNovelDataString00= myNovelDataArrayArray[0][0];
+      print('step_016: get user novels is completed with return 0 0 : $myNovelDataString00');
+      if (myNovelDataArrayArray[0][0]=='success') {
+        for(int i =0; i<myNovelDataArrayArray.length; i++) {
+          String datai1= myNovelDataArrayArray[i][1];
+          print('step_017: iteration $i is in progress with data i1 : $datai1');
+          myNovelData= myNovelData+ myNovelDataArrayArray[i][1]+ '<divider%83>'+ myNovelDataArrayArray[i][2]+ '<divider%83>'+ myNovelDataArrayArray[i][3]+ '<divider%71>';
+        }
+      }
+      NetworkHandler().saveString('user', 'myNovelData', myNovelData);
+      print('step_018: mynovel data is saved with key myNovelData');
       return myNovelData;
     } else {
-      return 'error';
+      return myNovelDataString;
     }
   }
 

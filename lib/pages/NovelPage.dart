@@ -19,13 +19,12 @@ class _NovelPageState extends State<NovelPage> {
   String rate= 'Loading...';
   bool fixedLoading=true;
   bool loading=true;
-  bool detailLoading=true;
   bool novelDataHasBeenLoadedFromNetwork= false;
-  List<String> novelData= ['0', 'Loading...<divider%69>Loading...', RawImageFiles().noData()];
+  List<String> novelData= ['0', 'Loading...<divider%69>Loading...', RawImageFiles().noData(), 'Loading...', 'Loading...'];
 
   @override
   Widget build(BuildContext context) {
-    if (loading) {getNovelData(); getNovelDetail(); loading=false; detailLoading=false;}
+    if (loading) {getNovelData(); loading=false;}
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70),
@@ -73,7 +72,7 @@ class _NovelPageState extends State<NovelPage> {
                         const SizedBox(height: 18),
                         getNovelAuthorContainer(fixedLoading, 18, 'Author', 28, 0.67*size.width-40),
                         const SizedBox(height: 2),
-                        getNovelRatingContainer(detailLoading, 27, 0.67*size.width-40),
+                        getNovelRatingContainer(loading, 27, 0.67*size.width-40),
                         const SizedBox(height: 12),
                         Container(
                           height: 40,
@@ -123,22 +122,11 @@ class _NovelPageState extends State<NovelPage> {
       String? novelDataString= await NetworkHandler().getString('user', 'novelData$novelId');
       print(novelDataString);
       if (novelDataString!=null) {
+        List<String> novelDataArray= novelDataString.split('<divider%83>');
+        getAuthorData(novelDataArray[5]);
         setState(() {
-          novelData= novelDataString.split('<divider%83>');
+          novelData= novelDataArray;
           loading=false;
-        });
-      }
-    }
-  }
-
-  Future<void> getNovelDetail() async{
-    String novelId= widget.novelId;
-    if (novelId!='0') {
-      List<String> novelDetailData= await NetworkHandler().getPostById(widget.token, novelId);
-      if (novelDetailData!=[]) {
-        setState(() {
-          rate= novelDetailData[3];
-          detailLoading=false;
         });
       }
     }
@@ -183,7 +171,7 @@ class _NovelPageState extends State<NovelPage> {
   }
 
   Widget getNovelRatingContainer(bool titleLoading, double height, double width) {
-    if (detailLoading) {
+    if (loading) {
       return Container(
         height: height,
         width: width,
@@ -196,7 +184,7 @@ class _NovelPageState extends State<NovelPage> {
         child: Align(
           alignment: Alignment.topLeft,
           child: Row(
-            children: [Text('Rating: '+ rate, style: TextStyle(fontSize: 18, color: AppTheme.themeColor))],
+            children: [Text('Rating: '+ novelData[3], style: TextStyle(fontSize: 18, color: AppTheme.themeColor))],
           ),
         ),
       );
@@ -204,11 +192,14 @@ class _NovelPageState extends State<NovelPage> {
   }
 
   Widget getNovelAuthorContainer(bool loading, double fontSize, String text, double height, double width) {
-    if (detailLoading) {
-      return Container(
+    if (loading) {
+      return SizedBox(
         height: height,
         width: width,
-        color: const Color.fromRGBO(245, 245, 245, 1),
+          child: Align(
+          alignment: Alignment.topLeft,
+          child:Text('Author: Loading...', style: TextStyle(fontSize: fontSize, color: AppTheme.themeColor, fontWeight: FontWeight.normal)),
+          )
       );
     } else {
       return SizedBox(
@@ -216,7 +207,7 @@ class _NovelPageState extends State<NovelPage> {
         width: width,
         child: Align(
           alignment: Alignment.topLeft,
-          child:Text(author, style: TextStyle(fontSize: fontSize, color: AppTheme.themeColor, fontWeight: FontWeight.normal)),
+          child:Text('Author: '+ author, style: TextStyle(fontSize: fontSize, color: AppTheme.themeColor, fontWeight: FontWeight.normal)),
         ),
       );
     }
@@ -230,9 +221,15 @@ class _NovelPageState extends State<NovelPage> {
     return stars;
   }
 
-  Future<void> getAuthor(index) async{
-    setState(() {
+  Future<void> getAuthorData(String userId) async{
+    if (userId!='error') {
+      List<String> authorData= await NetworkHandler().getUser(widget.token, userId);
+      setState(() {
+        author= authorData[1];
+      });
+    } else {
+      author= 'error';
+    }
 
-    });
   }
 }

@@ -39,9 +39,12 @@ class NetworkHandler {
       var id= decodedResponse['posts']['id'].toString();
       var title= decodedResponse['posts']['post_body'].toString();
       var image= decodedResponse['posts']['post_attribute_3'].toString();
-      return ['success', id, title, image];
+      var rate= decodedResponse['posts']['post_attribute_1'].toString();
+      var genre= decodedResponse['posts']['post_attribute_2'].toString();
+      var author= decodedResponse['posts']['post_user'].toString();
+      return ['success', id, title, image, rate, genre, author];
     } catch(e) {
-      return ['error', '0', 'something went wrong :<divider%69>$e', noData];
+      return ['error', '0', 'something went wrong :<divider%69>$e', noData, 'error', 'error', 'error'];
     }
   }
 
@@ -58,14 +61,15 @@ class NetworkHandler {
         String response2= decodedResponse['post'][0]['post_attribute_3'].toString();
         String response3= decodedResponse['post'][0]['post_attribute_1'].toString();
         String response4= decodedResponse['post'][0]['post_attribute_2'].toString();
-        return ['success', response1, response2, response3, response4];
+        String response5= decodedResponse['post'][0]['post_user'].toString();
+        return ['success', response1, response2, response3, response4, response5];
       } else if (decodedResponse['posts']!='[]') {
-        return ['zero', 'error<divider%69>error', 'error', 'error', 'error'];
+        return ['zero', 'error<divider%69>error', 'error', 'error', 'error', 'error'];
       } else {
-        return ['error', 'error<divider%69>error', 'error', 'error', 'error'];
+        return ['error', 'error<divider%69>error', 'error', 'error', 'error', 'error'];
       }
     } catch(e) {
-      return ['error', 'error<divider%69>error', 'error', 'error', 'error'];
+      return ['error', 'error<divider%69>error', 'error', 'error', 'error', 'error'];
     }
   }
 
@@ -246,6 +250,26 @@ class NetworkHandler {
     }//updated
   }
 
+  Future<List<String>> getUser(String token, String userId) async{
+    var response = await http.get(Uri.parse("http://ftunebackend.herokuapp.com/api/getuser/$userId"),
+        headers: {
+          "Content-type": "application/json",
+          "Authorization": "Bearer $token"
+        });
+    var decodedResponse= json.decode(response.body);
+    if (decodedResponse!=null) {
+      String name= decodedResponse['user']['name'].toString();
+      String email= decodedResponse['posts']['email'].toString();
+      String image= decodedResponse['posts']['user_attribute_1'].toString();
+      String detail= decodedResponse['posts']['user_attribute_3'].toString();
+      String billingDetail= decodedResponse['posts']['user_attribute_4'].toString();
+      List<String> finalResponse= [userId, name, email, image, detail, billingDetail];
+      return finalResponse;
+    } else {
+      return ['error', 'error', 'error', 'error', 'error<divider%54>error<divider%54>error<divider%54>error', 'error<divider%54>error'];
+    }
+  }
+
   //required sub-functions:
   //post function
   Future<http.Response> post(String url, Map<String, String> body) async {
@@ -293,4 +317,6 @@ class NetworkHandler {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_generateKey(userId, key));
   }
+
+
 }

@@ -37,7 +37,7 @@ class AppFunctions {
     //favorite novel data
     List<String> userLikedNovelIndices= await NetworkHandler().getUserLikedNovelIndices(token);
     String key0= 'userLikedNovelsIndices';
-    if (userLikedNovelIndices[0]!='error' && userLikedNovelIndices[0]!='zero') {
+    if (userLikedNovelIndices[0]!='error' && userLikedNovelIndices[0]!='zero' && userLikedNovelIndices[1]!='null') {
       List<String> userLikedNovelIndexList= userLikedNovelIndices[1].split('%');
       String value0= userLikedNovelIndices[1];
       print('step_001: user liked novel indices = '+ value0+ ' ...saving with key: $key0');
@@ -52,7 +52,7 @@ class AppFunctions {
           if (likedNovelDataForIthIteration[0]=='success') {
             String userLikedNovelId= userLikedNovelIndexList[i];
             print('step_004: favorite novel data for $i th iteration success, saving in storage with key: $key');
-            String ithLikedNovelDataString= '$userLikedNovelId<divider%83>'+ likedNovelDataForIthIteration[1]+ '<divider%83>'+likedNovelDataForIthIteration[2];
+            String ithLikedNovelDataString= '$userLikedNovelId<divider%83>'+ likedNovelDataForIthIteration[1]+ '<divider%83>'+likedNovelDataForIthIteration[2]+ '<divider%83>'+ likedNovelDataForIthIteration[3]+'<divider%83>'+ likedNovelDataForIthIteration[4]+'<divider%83>'+ likedNovelDataForIthIteration[5];
             NetworkHandler().saveString('user', key, ithLikedNovelDataString);
           } else {
             print('step_004b: favorite novel data for $i th iteration error/unsuccessful, it will be loaded in another try');
