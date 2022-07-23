@@ -34,6 +34,17 @@ class _DebugSlideState extends State<DebugSlide> {
   Future<void> getData() async{
     print('get data in progress');
     var size= MediaQuery.of(context).size;
+    String? myNovelData= await NetworkHandler().getString('user', 'myNovelData');
+    dataList.add(
+        Container(
+          width: size.width,
+          padding: const EdgeInsets.all(10),
+          child: Container(
+            constraints: BoxConstraints(maxWidth: size.width-20),
+            child: Align(alignment: Alignment.topLeft, child: Text('myNovelData= $myNovelData', style: TextStyle(fontSize: 15, color: AppTheme.themeColor))),
+          ),
+        )
+    );
     for (int i=0; i<31; i++) {
       print('get data on iteration $i');
       String? novelData= await NetworkHandler().getString('user', 'novelData$i');

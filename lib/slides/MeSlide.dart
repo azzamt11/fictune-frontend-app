@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../components/NovelDirectCard.dart';
 import '../helper/AppFunctions.dart';
 import '../helper/AppTheme.dart';
+import '../components/MyNovelScrollComponent.dart';
 
 class MeSlide extends StatefulWidget {
   final List<String> responseList;
@@ -64,7 +65,8 @@ class _MeSlideState extends State<MeSlide> {
 
   }
 
-  Future<String> getMyNovelData() async {
+  /*Future<String> getMyNovelData() async {
+    print('step_015a: my novel data in progress');
     String myNovelData= '';
     final String? myNovelDataString= await NetworkHandler().getString('user', 'myNovelData');
     if (myNovelDataString==null) {
@@ -85,7 +87,7 @@ class _MeSlideState extends State<MeSlide> {
     } else {
       return myNovelDataString;
     }
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -249,9 +251,9 @@ class _MeSlideState extends State<MeSlide> {
                           scrollDirection: Axis.vertical,
                           child: getFavoriteNovelsList(),
                         ),
-                        SingleChildScrollView(
+                        const SingleChildScrollView(
                           scrollDirection: Axis.vertical,
-                          child: getMyNovelsList(),
+                          child: MyNovelScrollComponent(),
                         ),
 
                       ]
@@ -262,44 +264,6 @@ class _MeSlideState extends State<MeSlide> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget getMyNovelsList() {
-    var size= MediaQuery.of(context).size;
-    return FutureBuilder(
-      future: getMyNovelData(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          String myNovelDataString= snapshot.data.toString();
-          if (myNovelDataString!='zero' && myNovelDataString!='error') {
-            List<String> myNovelData= myNovelDataString.split('<divider%71>');
-            return Column(
-              children: novelDirectCard(myNovelData, true),
-            );
-          } else if (myNovelDataString=='zero') {
-            return Column(
-              children: [SizedBox(
-                height: 100,
-                width: size.width,
-                child: Center(child: Text("You have not made any novels yet", style: TextStyle(fontSize: 18, color: AppTheme.themeColor))),
-              )],
-            );
-          } else {
-            return Column(
-              children: [SizedBox(
-                height: 100,
-                width: size.width,
-                child: Center(child: Text("Network Error", style: TextStyle(fontSize: 18, color: AppTheme.themeColor))),
-              )],
-            );
-          }
-        } else {
-          return Column(
-            children: widgetList(['0', '0', '0', '0'],false),
-          );
-        }
-      },
     );
   }
 

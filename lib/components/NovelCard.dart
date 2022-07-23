@@ -20,7 +20,9 @@ class NovelCard extends StatefulWidget {
 }
 
 class _NovelCardState extends State<NovelCard> {
+  int loadingTrial=0;
   bool loadingState= true;
+  bool imageNotFound=false;
   Widget activeWidget= Container(
     height: 150,
     width: 100,
@@ -30,14 +32,38 @@ class _NovelCardState extends State<NovelCard> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
+    setState(() {
+      loadingState=false;
+    });
   }
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      loadingState=true;
+    });
+  }
+
   //scaffold
   @override
   Widget build(BuildContext context) {
     print('novel card in progress');
-    if (loadingState==true) {setState(() {loadingState= false;}); getNovelData();}
+    if (loadingState==true && loadingTrial<5) {
+      setState(() {loadingState= false;});
+      getNovelData();
+    } else if (loadingTrial>=2) {
+      setState(() {
+        loadingState= false;
+        activeWidget= Container(
+            height: 150,
+            width: 100,
+            color: const Color.fromRGBO(245, 245, 245, 1),
+            child: Center(child: Text('Image Not Found', style: TextStyle(fontSize: 15, color: AppTheme.themeColor)))
+        );
+      });
+    }
     return activeWidget;
   }
 
@@ -54,7 +80,7 @@ class _NovelCardState extends State<NovelCard> {
         final novelRate= novelDataArray[4];
         final novelGenre= novelDataArray[5];
         final novelAuthorId= novelDataArray[6];
-        String novelDataString= novelId+'<divider%83>'+novelTitle+'<divider%83>'+novelImage+ '<divider%83>'+ novelRate+ '<divider%83'+ novelGenre + '<divider%83'+ novelAuthorId;
+        String novelDataString= novelId+'<divider%83>'+novelTitle+'<divider%83>'+novelImage+ '<divider%83>'+ novelRate+ '<divider%83>'+ novelGenre + '<divider%83>'+ novelAuthorId;
         NetworkHandler().saveString('user', 'novelData$novelId', novelDataString);
         print('step_013: novel data string has been saved with key: novelData$novelId');
         setState(() {
@@ -76,6 +102,7 @@ class _NovelCardState extends State<NovelCard> {
           );
         });
       } else {
+        loadingTrial++;
         setState(() {loadingState=true;});
       }
     }

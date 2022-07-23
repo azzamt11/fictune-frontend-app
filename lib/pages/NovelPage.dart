@@ -19,6 +19,7 @@ class _NovelPageState extends State<NovelPage> {
   String rate= 'Loading...';
   bool fixedLoading=true;
   bool loading=true;
+  bool authorLoading=true;
   bool novelDataHasBeenLoadedFromNetwork= false;
   List<String> novelData= ['0', 'Loading...<divider%69>Loading...', RawImageFiles().noData(), 'Loading...', 'Loading...'];
 
@@ -118,12 +119,15 @@ class _NovelPageState extends State<NovelPage> {
   Future<void> getNovelData() async{
     String novelId= widget.novelId;
     if (novelId!='0') {
-      print('step_014 (novel page): get novel data with key: novelData$novelId. Output: ');
+      print('step_019: get novel data in progress on novelId: $novelId');
       String? novelDataString= await NetworkHandler().getString('user', 'novelData$novelId');
+      print('step_020: get novel data has loaded the data from network, getting $novelDataString');
       print(novelDataString);
       if (novelDataString!=null) {
         List<String> novelDataArray= novelDataString.split('<divider%83>');
-        getAuthorData(novelDataArray[5]);
+        String userId= novelDataArray[5];
+        print('step_021: submitting userId : $userId into get author data. executing get author data');
+        getAuthorData(userId);
         setState(() {
           novelData= novelDataArray;
           loading=false;
@@ -192,7 +196,7 @@ class _NovelPageState extends State<NovelPage> {
   }
 
   Widget getNovelAuthorContainer(bool loading, double fontSize, String text, double height, double width) {
-    if (loading) {
+    if (authorLoading) {
       return SizedBox(
         height: height,
         width: width,
@@ -222,14 +226,29 @@ class _NovelPageState extends State<NovelPage> {
   }
 
   Future<void> getAuthorData(String userId) async{
-    if (userId!='error') {
-      List<String> authorData= await NetworkHandler().getUser(widget.token, userId);
-      setState(() {
-        author= authorData[1];
-      });
+    print('step_022a: getting author name from network in progress');
+    String? authorName= await NetworkHandler().getString('user', 'authorName$userId');
+    if (authorName==null || authorName=='error') {
+      print('step_022: get author data from network in progress on userId: $userId');
+      if (userId!='error') {
+        List<String> authorData= await NetworkHandler().getUser(widget.token, userId);
+        String authorData1= authorData[1];
+        print('step_025: authorName has been loaded, authorData [1] (name): $authorData1, saving to local storage');
+        NetworkHandler().saveString('user', 'authorName$userId',authorData[1]);
+        setState(() {
+          author= authorData[1];
+          print('author data has been updated, author: $author');
+          authorLoading=false;
+        });
+      } else {
+        print('step_025 (interrupted): authorData has failed to load, returning error');
+        author= 'error';
+      }
     } else {
-      author= 'error';
+      setState(() {
+        author= authorName;
+        print('step_023 : authorData has successfully been loaded from local storage, author has been updated');
+      });
     }
-
   }
 }

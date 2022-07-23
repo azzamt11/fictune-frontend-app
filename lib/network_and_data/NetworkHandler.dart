@@ -256,13 +256,15 @@ class NetworkHandler {
           "Content-type": "application/json",
           "Authorization": "Bearer $token"
         });
+    print('step_23: response body from network: '+ response.body.toString());
     var decodedResponse= json.decode(response.body);
+    print('step_24: json decoded [user] [name] from network: '+ decodedResponse['user']['name'].toString());
     if (decodedResponse!=null) {
       String name= decodedResponse['user']['name'].toString();
-      String email= decodedResponse['posts']['email'].toString();
-      String image= decodedResponse['posts']['user_attribute_1'].toString();
-      String detail= decodedResponse['posts']['user_attribute_3'].toString();
-      String billingDetail= decodedResponse['posts']['user_attribute_4'].toString();
+      String email= decodedResponse['user']['email'].toString();
+      String image= decodedResponse['user']['user_attribute_1'].toString();
+      String detail= decodedResponse['user']['user_attribute_3'].toString();
+      String billingDetail= decodedResponse['user']['user_attribute_4'].toString();
       List<String> finalResponse= [userId, name, email, image, detail, billingDetail];
       return finalResponse;
     } else {
