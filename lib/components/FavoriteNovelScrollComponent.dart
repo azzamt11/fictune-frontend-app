@@ -159,4 +159,90 @@ class _MyNovelScrollComponentState extends State<MyNovelScrollComponent> {
       novelData= myNovelData;
     });
   }
+
+  /*Widget getFavoriteNovelsList() {
+    var size= MediaQuery.of(context).size;
+    return FutureBuilder(
+      future: getFavoriteNovelData(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          print('step_009: snapshot has data');
+          String favoriteNovelDataString= snapshot.data.toString();
+          if (favoriteNovelDataString=='zero') {
+            print('step_010: novel data string zero, returning You-have-not-liked-any-novels-yet-single-widget widget list');
+            return Column(
+                children: [SizedBox(
+                  height: 100,
+                  width: size.width,
+                  child: Center(child: Text("You have not liked any novels yet", style: TextStyle(fontSize: 18, color: AppTheme.themeColor))),
+                )],
+            );
+          } else if (favoriteNovelDataString=='') {
+            return Column(
+              children: [SizedBox(
+                height: 100,
+                width: size.width,
+                child: Center(child: Text("Network Error", style: TextStyle(fontSize: 18, color: AppTheme.themeColor))),
+              )],
+            );
+          } else {
+            print('step_010: novel data string found, separating the novel data with separator <divider%71>');
+            String secondElementsOnCheck= favoriteNovelDataString[1];
+            print('the second element after separating with <divider%71> is: $secondElementsOnCheck');
+            List<String> favoriteNovelData= favoriteNovelDataString.split('<divider%71>');
+            print('step_011: returning the novel Direct Card with the data');
+            return Column(
+              children: novelDirectCard(favoriteNovelData, true),
+            );
+          }
+        } else {
+          return Column(
+            children: widgetList(['0', '0', '0', '0'],false),
+          );
+        }
+      },
+    );
+  }
+
+  Future<String> getFavoriteNovelData() async {
+    String token= widget.responseList[1];
+    String novelData= '';
+    String userLikedNovelsIndices;
+    print('step_005 (on MeSlide): get favorite novel data in progress');
+    String key0= 'userLikedNovelsIndices';
+    String? userLikedNovelsIndicesFromStorage= await NetworkHandler().getString('user', key0);
+    if (userLikedNovelsIndicesFromStorage==null) {
+      List<String> userLikedNovelsIndicesArray= await NetworkHandler().getUserLikedNovelIndices(token);
+      userLikedNovelsIndices= userLikedNovelsIndicesArray[1];
+    } else {
+      userLikedNovelsIndices= userLikedNovelsIndicesFromStorage;
+    }
+    if (userLikedNovelsIndices!='error' && userLikedNovelsIndices!='zero') {
+      List<String> userLikedNovelIndexList= userLikedNovelsIndices.split('%');
+      for (int i=0; i<max(userLikedNovelIndexList.length-1, 1); i++) {
+        if (userLikedNovelIndexList[i]!='null') {
+          String key= 'novelData'+userLikedNovelIndexList[i];
+          print('step_006 (on MeSlide): iteration $i getting file with key: $key');
+          String? novelDataForIthIteration= await NetworkHandler().getString('user', key);
+          if (novelDataForIthIteration!=null) {
+            print('step_007 (on MeSlide): novel data for iteration $i for key: $key is found, insert to novelData with separator <divider%71>...');
+            novelData= novelData+ novelDataForIthIteration + '<divider%71>';
+          } else {
+            print('step_007b (on MeSlide): novel data for iteration $i for key: $key is not found. continue to the next iteration');
+          }
+        } else {
+          print('step_006 (interrupted): userLikedNovelIndexList[i]==null');
+          return 'zero';
+        }
+      }
+      print('step_008 (on MeSlide): novel Data has been fulfilled, returning the data');
+      return novelData;
+    } else if (userLikedNovelsIndices!=null && userLikedNovelsIndices=='zero') {
+      return 'zero';
+    } else {
+      print('step_006b (on MeSlide): indices not found. Returning null string');
+      return novelData;
+    }
+
+  }*/
 }
