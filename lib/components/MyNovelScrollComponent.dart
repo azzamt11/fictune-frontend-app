@@ -17,34 +17,40 @@ class MyNovelScrollComponent extends StatefulWidget {
 
 class _MyNovelScrollComponentState extends State<MyNovelScrollComponent> {
   bool loadingState= true;
+  bool isMyNovelExist=true;
+  bool isNetworkError=false;
   int loadingCount=0;
   List<String> novelData= [];
-  List<String> novelsList= [];
   @override
   Widget build(BuildContext context) {
+    print('step_001: building the widget, checking the states: loadingState= $loadingState, isMyNovelExist= $isMyNovelExist, isNetworkError= $isNetworkError');
     if (loadingState==true && loadingCount<2) {
+      print('step_002: state condition type-1 is occurred, submitting to getMyNovelData');
       setState(() {loadingState=false;});
       getMyNovelsData();
     } else if (loadingCount>=2) {
-      setState(() {loadingState=false;});
+      setState(() {loadingState=false; isMyNovelExist=false;});
     }
     return getMyNovelsList();
   }
 
   Widget getMyNovelsList() {
+    print('step_009: getNovelsList in progress, submitting to novelWidgetList');
     var size= MediaQuery.of(context).size;
     return SizedBox(
       width: size.width,
       child: Column(
-        children: novelWidgetList(novelsList),
+        children: novelWidgetList(),
       )
     );
   }
 
-  List<Widget> novelWidgetList(List<String> novelsList) {
+  List<Widget> novelWidgetList() {
+    print('step_010: novelWidgetList in progress, checking state: loadingState= $loadingState, isMyNovelExist= $isMyNovelExist, isNetworkError= $isNetworkError');
     List<Widget> widgetList= [];
     var size= MediaQuery.of(context).size;
-    if (loadingState) {
+    if (loadingState && isMyNovelExist) {
+      print('step_011: state type-1 is entered');
       for (int i=0; i<4; i++) {
         widgetList.add(Container(
             height: 160,
@@ -57,7 +63,7 @@ class _MyNovelScrollComponentState extends State<MyNovelScrollComponent> {
                     width: 100,
                     color: const Color.fromRGBO(245, 245, 245, 1),
                     child: Center(
-                      child: Text('Loading...', style: TextStyle(fontSize: 18, color: AppTheme.themeColor)),
+                      child: Text('Loading...$loadingCount', style: TextStyle(fontSize: 18, color: AppTheme.themeColor)),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -77,7 +83,8 @@ class _MyNovelScrollComponentState extends State<MyNovelScrollComponent> {
             )
         ));
       }
-    } else {
+    } else if (!loadingState && isMyNovelExist && novelData.isNotEmpty) {
+      print('step_011: state type-2 is entered, the data is ready to be exploited');
       for (int i=0; i<max(novelData.length-1, 1); i++) {
         widgetList.add(Container(
             height: 160,
@@ -126,36 +133,68 @@ class _MyNovelScrollComponentState extends State<MyNovelScrollComponent> {
             )
         ));
       }
+    } else if (isMyNovelExist && isNetworkError) {
+      print('step_011: state type-3 is entered, returning the appropriate output');
+      widgetList.add(SizedBox(
+          height: 200,
+          width: size.width,
+          child: Center(
+            child: Text('Network Error: Check your connection!', style: TextStyle(fontSize: 18, color: AppTheme.themeColor),),
+          )
+      ));
+    } else if (!isMyNovelExist) {
+      print('step_011: state type-4 is entered, returning the appropriate output');
+      widgetList.add(SizedBox(
+          height: 200,
+          width: size.width,
+          child: Center(
+          child: Text('You have not created any novels yet.', style: TextStyle(fontSize: 18, color: AppTheme.themeColor),),
+        )
+      ));
     }
 
     return widgetList;
   }
 
   Future<void> getMyNovelsData() async{
+    print('step_003: getMyNovelData in progress');
     List<String> myNovelData= [];
-    print('step_026 (mnsc): get my novels data in progress getting string with key myNovelData');
+    print('step_004: fetching myNovelsDataString the data from local storage');
     String? myNovelsDataString= await NetworkHandler().getString('user', 'myNovelData');
     if (myNovelsDataString!=null&& myNovelsDataString!='zero' && myNovelsDataString!='error') {
+      print('step_005: myNovelsDataString is successfully fetched, separating with the divider');
       List<String> myNovelsDataArray= myNovelsDataString.split('<divider%71>');
       for (int i=0; i<max(myNovelsDataArray.length-1, 1); i++) {
+        print('step_006: iteration $i in progress, myNovelData has been updated');
         myNovelData.add(myNovelsDataArray[i]);
       }
     } else if (myNovelsDataString=='zero'){
-      print('zero my novel data detected');
+      print('step_005: myNovelsDataString is zero, chance the state isMyNovelExist to false');
       myNovelData.add('zero');
-    } else {
+      setState(() {
+        isMyNovelExist=false;
+      });
+    } else if (myNovelsDataString==null) {
+      print('step_005: myNovelsDataString is null, submitting to getUsetNovels');
       List<List<String>> myNovelsDataArray= await NetworkHandler().getUserNovels(widget.token); //['success', novelId, novelTitle, novelImage])
       if (myNovelsDataArray[0][0]=='success') {
+        print('step_006: myNovelsDataArray is successfully fetched from network, starting the iteration');
         for (int i=0; i<myNovelsDataArray.length; i++) {
+          print('step_007: iteration $i is in progress, joining with separator');
           myNovelData.add(myNovelsDataArray[i][1]+ '<divider%83>'+ myNovelsDataArray[i][2] +'<divider%83>' + myNovelsDataArray[i][3]);
         }
-      } else {
+      } else if (myNovelsDataString=='error') {
+        print('step_006: myNovelsDataArray is failed to load from network, returning error, changing the states');
         myNovelData.add('error');
-        loadingState= true;
-        loadingCount++;
+        setState(() {
+          isNetworkError= true;
+          loadingState= false;
+          loadingCount++;
+        });
       }
     }
     setState(() {
+      print('step_008: updating novel data');
       novelData= myNovelData;
     });
   }

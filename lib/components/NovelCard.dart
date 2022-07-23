@@ -20,50 +20,24 @@ class NovelCard extends StatefulWidget {
 }
 
 class _NovelCardState extends State<NovelCard> {
-  int loadingTrial=0;
   bool loadingState= true;
-  bool imageNotFound=false;
   Widget activeWidget= Container(
-    height: 150,
-    width: 100,
-    color: const Color.fromRGBO(245, 245, 245, 1),
-    child: Center(child: Text('Loading...', style: TextStyle(fontSize: 15, color: AppTheme.themeColor)))
+      height: 150,
+      width: 100,
+      color: const Color.fromRGBO(245, 245, 245, 1),
+      child: Center(child: Text('Loading...', style: TextStyle(fontSize: 15, color: AppTheme.themeColor)))
   );
 
   @override
   void dispose() {
+    // TODO: implement dispose
     super.dispose();
-    setState(() {
-      loadingState=false;
-    });
   }
-
-  @override
-  void initState() {
-    super.initState();
-    setState(() {
-      loadingState=true;
-    });
-  }
-
   //scaffold
   @override
   Widget build(BuildContext context) {
     print('novel card in progress');
-    if (loadingState==true && loadingTrial<5) {
-      setState(() {loadingState= false;});
-      getNovelData();
-    } else if (loadingTrial>=2) {
-      setState(() {
-        loadingState= false;
-        activeWidget= Container(
-            height: 150,
-            width: 100,
-            color: const Color.fromRGBO(245, 245, 245, 1),
-            child: Center(child: Text('Image Not Found', style: TextStyle(fontSize: 15, color: AppTheme.themeColor)))
-        );
-      });
-    }
+    if (loadingState==true) {getNovelData(); setState(() {loadingState= false;});}
     return activeWidget;
   }
 
@@ -73,38 +47,32 @@ class _NovelCardState extends State<NovelCard> {
     String token=widget.token;
     if (widget.custom==0) {
       List<String> novelDataArray= await NetworkHandler().getLatestPostsByGenre(genre, index, token);
-      if (novelDataArray[0]=='success') {
-        final novelId= novelDataArray[1];
-        final novelTitle= novelDataArray[2];
-        final novelImage= novelDataArray[3];
-        final novelRate= novelDataArray[4];
-        final novelGenre= novelDataArray[5];
-        final novelAuthorId= novelDataArray[6];
-        String novelDataString= novelId+'<divider%83>'+novelTitle+'<divider%83>'+novelImage+ '<divider%83>'+ novelRate+ '<divider%83>'+ novelGenre + '<divider%83>'+ novelAuthorId;
-        NetworkHandler().saveString('user', 'novelData$novelId', novelDataString);
-        print('step_013: novel data string has been saved with key: novelData$novelId');
-        setState(() {
-          activeWidget= GestureDetector(
-            onTap: () {
-              print('step_014: navigating to Novel Page with token : $token, novelId: $novelId');
-              Navigator.push(context, MaterialPageRoute(builder: (context)=> NovelPage(token: token, novelId: novelId)));
-            },
-            child: Container(
-                height: 150,
-                width: 100,
-                decoration: BoxDecoration(
-                    image: DecorationImage(
-                      fit: BoxFit.cover,
-                      image: MemoryImage(AppFunctions().convertBase64Image(novelImage)),
-                    )
-                )
-            ),
-          );
-        });
-      } else {
-        loadingTrial++;
-        setState(() {loadingState=true;});
-      }
+      final novelId= novelDataArray[1];
+      final novelTitle= novelDataArray[2];
+      final novelImage= novelDataArray[3];
+      final novelRate= novelDataArray[4];
+      final novelGenre= novelDataArray[5];
+      final novelAuthorId= novelDataArray[6];
+      String novelDataString= novelId+'<divider%83>'+novelTitle+'<divider%83>'+novelImage+ '<divider%83>'+ novelRate+ '<divider%83'+ novelGenre + '<divider%83'+ novelAuthorId;
+      NetworkHandler().saveString('user', 'novelData$novelId', novelDataString);
+      print('step_013: novel data string has been saved with key: novelData$novelId');
+      setState(() {
+        activeWidget= GestureDetector(
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context)=> NovelPage(token: token, novelId: novelId)));
+          },
+          child: Container(
+              height: 150,
+              width: 100,
+              decoration: BoxDecoration(
+                  image: DecorationImage(
+                    fit: BoxFit.cover,
+                    image: MemoryImage(AppFunctions().convertBase64Image(novelImage)),
+                  )
+              )
+          ),
+        );
+      });
     }
 
   }

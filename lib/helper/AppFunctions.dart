@@ -1,11 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
-
 import '../network_and_data/NetworkHandler.dart';
-import '../pages/AuthPage.dart';
-import '../pages/RootPage.dart';
 
 class AppFunctions {
   //string-image conversion
@@ -14,30 +10,11 @@ class AppFunctions {
     return bytes;
   }
 
-  //root-login navigation
-  Future<void> navigateToRootOrLogin(context) async{
-    String? response1= await NetworkHandler().getString('user', 'token');
-    if (response1!=null) {
-      getData(response1);
-    }
-    String? response2= await NetworkHandler().getString('user', 'user_name');
-    String? response3= await NetworkHandler().getString('user', 'user_id');
-    String? response4= await NetworkHandler().getString('user', 'user_attribute');
-    String? response5= await NetworkHandler().getString('user', 'user_userdata');
-    String? response6= await NetworkHandler().getString('user', 'user_userbillingdata');
-    if (response1!=null && response2!=null && response3!=null && response4!=null&& response5!=null && response6!=null) {
-      List<String> responseList= ['success', response1, response2, response3, response4, response5, response6];
-      Navigator.push(context, MaterialPageRoute(builder: (context)=> RootPage(responseList: responseList)));
-    } else {
-      Navigator.push(context, MaterialPageRoute(builder: (context)=> const AuthPage()));
-    }
-  }
-
   Future<void> getData(String token) async{
     //favorite novel data
     List<String> userLikedNovelIndices= await NetworkHandler().getUserLikedNovelIndices(token);
     String key0= 'userLikedNovelsIndices';
-    if (userLikedNovelIndices[0]!='error' && userLikedNovelIndices[0]!='zero' && userLikedNovelIndices[1]!='null') {
+    if (userLikedNovelIndices[0]!='error' && userLikedNovelIndices[0]!='zero') {
       List<String> userLikedNovelIndexList= userLikedNovelIndices[1].split('%');
       String value0= userLikedNovelIndices[1];
       print('step_001: user liked novel indices = '+ value0+ ' ...saving with key: $key0');

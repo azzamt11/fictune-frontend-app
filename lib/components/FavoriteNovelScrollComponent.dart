@@ -7,44 +7,52 @@ import '../helper/AppTheme.dart';
 import '../network_and_data/NetworkHandler.dart';
 import 'NovelDirectCard.dart';
 
-class MyNovelScrollComponent extends StatefulWidget {
+class FavoriteNovelScrollComponent extends StatefulWidget {
   final String token;
-  const MyNovelScrollComponent({Key? key, required this.token}) : super(key: key);
+  const FavoriteNovelScrollComponent({Key? key, required this.token}) : super(key: key);
 
   @override
-  State<MyNovelScrollComponent> createState() => _MyNovelScrollComponentState();
+  State<FavoriteNovelScrollComponent> createState() => _FavoriteNovelScrollComponentState();
 }
 
-class _MyNovelScrollComponentState extends State<MyNovelScrollComponent> {
+class _FavoriteNovelScrollComponentState extends State<FavoriteNovelScrollComponent> {
   bool loadingState= true;
   int loadingCount=0;
+  bool isFavoriteNovelExist=true;
+  bool isNetworkError= false;
   List<String> novelData= [];
   List<String> novelsList= [];
   @override
   Widget build(BuildContext context) {
+    print('step_001: building the widget, checking the states: loadingState= $loadingState, isFavoriteNovelExist= $isFavoriteNovelExist, isNetworkError= $isNetworkError');
     if (loadingState==true && loadingCount<2) {
+      print('step_002: state condition type-1 is occurred, submitting to getFavoriteNovelData');
       setState(() {loadingState=false;});
-      getMyNovelsData();
+      getFavoriteNovelsData();
     } else if (loadingCount>=2) {
+      print('step_002: state condition type-2 is occurred, submitting to getFavoriteNovelsList');
       setState(() {loadingState=false;});
     }
-    return getMyNovelsList();
+    return getFavoriteNovelsList();
   }
 
-  Widget getMyNovelsList() {
+  Widget getFavoriteNovelsList() {
+    print('step_012: getFavoriteNovelsList in progress, submitting to novelWidgetList');
     var size= MediaQuery.of(context).size;
     return SizedBox(
       width: size.width,
       child: Column(
-        children: novelWidgetList(novelsList),
+        children: novelWidgetList(),
       )
     );
   }
 
-  List<Widget> novelWidgetList(List<String> novelsList) {
+  List<Widget> novelWidgetList() {
+    print('step_013: NovelWidgetList in progress');
     List<Widget> widgetList= [];
     var size= MediaQuery.of(context).size;
-    if (loadingState) {
+    if (loadingState && isFavoriteNovelExist && !isNetworkError) {
+      print('step_014: state type-1 is occurred');
       for (int i=0; i<4; i++) {
         widgetList.add(Container(
             height: 160,
@@ -77,8 +85,9 @@ class _MyNovelScrollComponentState extends State<MyNovelScrollComponent> {
             )
         ));
       }
-    } else {
-      for (int i=0; i<max(novelData.length-1, 1); i++) {
+    } else if (!loadingState && isFavoriteNovelExist && !isNetworkError && novelData.isNotEmpty) {
+      print('step_014: state type-2 is occurred');
+      for (int i=0; i<novelData.length; i++) {
         widgetList.add(Container(
             height: 160,
             width: size.width,
@@ -126,123 +135,110 @@ class _MyNovelScrollComponentState extends State<MyNovelScrollComponent> {
             )
         ));
       }
+    } else if (isFavoriteNovelExist && isNetworkError) {
+      print('step_014: state type-3 is occurred');
+      widgetList.add(SizedBox(
+          height: 200,
+          width: size.width,
+          child: Center(
+            child: Text('Network Error: Check your connection!', style: TextStyle(fontSize: 18, color: AppTheme.themeColor),),
+          )
+      ));
+    } else if (!isFavoriteNovelExist) {
+      print('step_014: state type-4 is occurred');
+      widgetList.add(SizedBox(
+          height: 200,
+          width: size.width,
+          child: Center(
+            child: Text('You have not liked any novels yet.', style: TextStyle(fontSize: 18, color: AppTheme.themeColor),),
+          )
+      ));
     }
 
     return widgetList;
   }
 
-  Future<void> getMyNovelsData() async{
-    List<String> myNovelData= [];
-    print('step_026 (mnsc): get my novels data in progress getting string with key myNovelData');
-    String? myNovelsDataString= await NetworkHandler().getString('user', 'myNovelData');
-    if (myNovelsDataString!=null&& myNovelsDataString!='zero' && myNovelsDataString!='error') {
-      List<String> myNovelsDataArray= myNovelsDataString.split('<divider%71>');
-      for (int i=0; i<max(myNovelsDataArray.length-1, 1); i++) {
-        myNovelData.add(myNovelsDataArray[i]);
-      }
-    } else if (myNovelsDataString=='zero'){
-      print('zero my novel data detected');
-      myNovelData.add('zero');
-    } else {
-      List<List<String>> myNovelsDataArray= await NetworkHandler().getUserNovels(widget.token); //['success', novelId, novelTitle, novelImage])
-      if (myNovelsDataArray[0][0]=='success') {
-        for (int i=0; i<myNovelsDataArray.length; i++) {
-          myNovelData.add(myNovelsDataArray[i][1]+ '<divider%83>'+ myNovelsDataArray[i][2] +'<divider%83>' + myNovelsDataArray[i][3]);
+  Future<void> getFavoriteNovelsData() async{
+    print('step_003: getFavoriteNovelData in progress');
+    List<String> favoriteNovelData= [];
+    print('step_004: fetching favoriteNovelsDataIndices the data from local storage');
+    String? favoriteNovelsIndices= await NetworkHandler().getString('user', 'userLikedNovelsIndices');
+    print('step_004b: favoriteNovelsDataIndices : $favoriteNovelsIndices');
+    if (favoriteNovelsIndices==null) {
+      print('step_005: favoriteNovelsIndices is failed to load from local storage, fetching from network');
+      List<String> favoriteNovelsIndicesArray= await NetworkHandler().getUserLikedNovelIndices(widget.token);
+      if(favoriteNovelsIndicesArray[0]=='success') {
+        favoriteNovelsIndices= favoriteNovelsIndicesArray[1];
+        print('step_006: favoriteNovelsDataIndices is successfully to load from network, favoriteNovelIndices: $favoriteNovelsIndices, separating with %');
+        List<String> favoriteNovelsIndexList= favoriteNovelsIndices.split('%');
+        for (int i=0; i<max(favoriteNovelsIndexList.length-1, 1); i++) {
+          String ithNovelId= favoriteNovelsIndexList[i];
+          print('step_007: iteration $i for id $ithNovelId is in progress');
+          String? ithFavoriteNovelData= await NetworkHandler().getString('user', 'novelData$ithNovelId');
+          print('step_008: favoriteNovels of id $ithNovelId is successfully loaded from local storage, checking the null-error-zero condition');
+          if (ithFavoriteNovelData!=null && ithFavoriteNovelData!='error' && ithFavoriteNovelData!='zero') {
+            print('step_009: the data passed null-error-zero condition, adding to favoriteNovelData');
+            favoriteNovelData.add(ithFavoriteNovelData);
+          } else {
+            print('step_010: the data failed to pass null-error-zero condition, fetching to network');
+            List<String> ithFavoriteNovelData= await NetworkHandler().getPostById(widget.token, ithNovelId);
+            if (ithFavoriteNovelData[0]=='success') {
+              print('step_011: the data successfully loaded from network, adding to favoriteNovelData and saving to local storage');
+              String novelDataString= ithNovelId+ '<divider%83>'+ithFavoriteNovelData[1]+ '<divider%83>'+ ithFavoriteNovelData[2];
+              favoriteNovelData.add(novelDataString);
+              NetworkHandler().saveString('user', 'novelData$ithNovelId', novelDataString);
+            }
+          }
         }
       } else {
-        myNovelData.add('error');
-        loadingState= true;
-        loadingCount++;
+        print('step_006: favoriteNovelsDataIndices is failed to load from network, changing the states');
+        setState(() {
+          isNetworkError=true;
+          loadingState= false;
+        });
       }
+    } else if (favoriteNovelsIndices!='null' && favoriteNovelsIndices!='error' && favoriteNovelsIndices!='zero') {
+      print('step_005: favoriteNovelsIndices is successfully loaded from local storage, passing the null-error-zero condition, separating with %');
+      List<String> favoriteNovelsIndexList= favoriteNovelsIndices.split('%');
+      for (int i=0; i<max(favoriteNovelsIndexList.length-1, 1); i++) {
+        String ithNovelId= favoriteNovelsIndexList[i];
+        print('step_006: iteration $i for id $ithNovelId is in progress');
+        String? ithFavoriteNovelData= await NetworkHandler().getString('user', 'novelData$ithNovelId');
+        print('step_007: favoriteNovels of id $ithNovelId is successfully loaded from local storage, checking the null-error-zero condition');
+        if (ithFavoriteNovelData!=null && ithFavoriteNovelData!='error' && ithFavoriteNovelData!='zero') {
+          print('step_008: the data passed null-error-zero condition, adding to favoriteNovelData');
+          favoriteNovelData.add(ithFavoriteNovelData);
+        } else {
+          print('step_009: the data failed to pass null-error-zero condition, fetching to network');
+          List<String> ithFavoriteNovelData= await NetworkHandler().getPostById(widget.token, ithNovelId);
+          if (ithFavoriteNovelData[0]=='success') {
+            print('step_010: the data successfully loaded from network, adding to favoriteNovelData and saving to local storage');
+            favoriteNovelData.add(ithNovelId+ '<divider%83>'+ithFavoriteNovelData[1]+ '<divider%83>'+ ithFavoriteNovelData[2]);
+            String novelDataString= ithNovelId+ '<divider%83>'+ithFavoriteNovelData[1]+ '<divider%83>'+ ithFavoriteNovelData[2];
+            favoriteNovelData.add(novelDataString);
+            NetworkHandler().saveString('user', 'novelData$ithNovelId', novelDataString);
+          }
+        }
+      }
+    } else if (favoriteNovelsIndices=='null' || favoriteNovelsIndices=='' || favoriteNovelsIndices=='zero'){
+      print('step_005: favoriteNovelsIndices is successfully loaded from local storage but returning zero, setting sFavoriteNovelExist to false');
+      print('zero favorite novel data detected');
+      setState(() {
+        isFavoriteNovelExist=false;
+      });
+    } else if (favoriteNovelsIndices=='error') {
+      print('step_005: favoriteNovelsIndices is successfully loaded from local storage but returning zero, setting sFavoriteNovelExist to false');
+      favoriteNovelData.add('error');
+      setState(() {
+        isNetworkError=true;
+        loadingState= false;
+        loadingCount++;
+      });
     }
     setState(() {
-      novelData= myNovelData;
+      print('step_008: updating novel data');
+      novelData= favoriteNovelData;
     });
   }
 
-  /*Widget getFavoriteNovelsList() {
-    var size= MediaQuery.of(context).size;
-    return FutureBuilder(
-      future: getFavoriteNovelData(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          print('step_009: snapshot has data');
-          String favoriteNovelDataString= snapshot.data.toString();
-          if (favoriteNovelDataString=='zero') {
-            print('step_010: novel data string zero, returning You-have-not-liked-any-novels-yet-single-widget widget list');
-            return Column(
-                children: [SizedBox(
-                  height: 100,
-                  width: size.width,
-                  child: Center(child: Text("You have not liked any novels yet", style: TextStyle(fontSize: 18, color: AppTheme.themeColor))),
-                )],
-            );
-          } else if (favoriteNovelDataString=='') {
-            return Column(
-              children: [SizedBox(
-                height: 100,
-                width: size.width,
-                child: Center(child: Text("Network Error", style: TextStyle(fontSize: 18, color: AppTheme.themeColor))),
-              )],
-            );
-          } else {
-            print('step_010: novel data string found, separating the novel data with separator <divider%71>');
-            String secondElementsOnCheck= favoriteNovelDataString[1];
-            print('the second element after separating with <divider%71> is: $secondElementsOnCheck');
-            List<String> favoriteNovelData= favoriteNovelDataString.split('<divider%71>');
-            print('step_011: returning the novel Direct Card with the data');
-            return Column(
-              children: novelDirectCard(favoriteNovelData, true),
-            );
-          }
-        } else {
-          return Column(
-            children: widgetList(['0', '0', '0', '0'],false),
-          );
-        }
-      },
-    );
-  }
-
-  Future<String> getFavoriteNovelData() async {
-    String token= widget.responseList[1];
-    String novelData= '';
-    String userLikedNovelsIndices;
-    print('step_005 (on MeSlide): get favorite novel data in progress');
-    String key0= 'userLikedNovelsIndices';
-    String? userLikedNovelsIndicesFromStorage= await NetworkHandler().getString('user', key0);
-    if (userLikedNovelsIndicesFromStorage==null) {
-      List<String> userLikedNovelsIndicesArray= await NetworkHandler().getUserLikedNovelIndices(token);
-      userLikedNovelsIndices= userLikedNovelsIndicesArray[1];
-    } else {
-      userLikedNovelsIndices= userLikedNovelsIndicesFromStorage;
-    }
-    if (userLikedNovelsIndices!='error' && userLikedNovelsIndices!='zero') {
-      List<String> userLikedNovelIndexList= userLikedNovelsIndices.split('%');
-      for (int i=0; i<max(userLikedNovelIndexList.length-1, 1); i++) {
-        if (userLikedNovelIndexList[i]!='null') {
-          String key= 'novelData'+userLikedNovelIndexList[i];
-          print('step_006 (on MeSlide): iteration $i getting file with key: $key');
-          String? novelDataForIthIteration= await NetworkHandler().getString('user', key);
-          if (novelDataForIthIteration!=null) {
-            print('step_007 (on MeSlide): novel data for iteration $i for key: $key is found, insert to novelData with separator <divider%71>...');
-            novelData= novelData+ novelDataForIthIteration + '<divider%71>';
-          } else {
-            print('step_007b (on MeSlide): novel data for iteration $i for key: $key is not found. continue to the next iteration');
-          }
-        } else {
-          print('step_006 (interrupted): userLikedNovelIndexList[i]==null');
-          return 'zero';
-        }
-      }
-      print('step_008 (on MeSlide): novel Data has been fulfilled, returning the data');
-      return novelData;
-    } else if (userLikedNovelsIndices!=null && userLikedNovelsIndices=='zero') {
-      return 'zero';
-    } else {
-      print('step_006b (on MeSlide): indices not found. Returning null string');
-      return novelData;
-    }
-
-  }*/
 }

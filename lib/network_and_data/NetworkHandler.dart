@@ -95,6 +95,33 @@ class NetworkHandler {
 
   //user preference function
   Future<List<String>> getUserLikedNovelIndices(String token) async {
+    try {
+      var response = await http.get(Uri.parse("http://ftunebackend.herokuapp.com/api/user"),
+          headers: {
+            "Content-type": "application/json",
+            "Authorization": "Bearer $token"
+          });
+      var decodedResponse= json.decode(response.body);
+      if (decodedResponse!=null) {
+        String responseString= decodedResponse['user']['user_attribute_2'].toString();
+        if (responseString==''|| responseString=='null') {
+          return ['zero', 'zero'];
+        } else {
+          String finalResponse= responseString.split('<divider%39>')[0];
+          return ['success', finalResponse];
+        }
+      } else {
+        return ['error', 'error'];
+      }
+    } catch(e) {
+      print(e);
+      return ['error', 'error'];
+    }
+
+  }
+
+  //user preference function
+  Future<List<String>> getMyProfileData(String token) async {
     var response = await http.get(Uri.parse("http://ftunebackend.herokuapp.com/api/user"),
         headers: {
           "Content-type": "application/json",
@@ -102,16 +129,13 @@ class NetworkHandler {
         });
     var decodedResponse= json.decode(response.body);
     if (decodedResponse!=null) {
-      String responseString= decodedResponse['user_attribute_2'].toString();
-      if (responseString=='') {
-        return ['zero', ''];
-      } else {
-        String finalResponse= responseString.split('<divider%39>')[0];
-        return ['success', finalResponse];
-      }
+      String response1= decodedResponse['user']['user_attribute_2'].toString();
+      String response2= decodedResponse['user']['name'].toString();
+      return [response1, response2, decodedResponse.toString()];
     } else {
-      return ['error', 'error'];
+      return ['error', 'error', 'error'];
     }
+
   }
 
   //user novels data
@@ -265,10 +289,11 @@ class NetworkHandler {
       String image= decodedResponse['user']['user_attribute_1'].toString();
       String detail= decodedResponse['user']['user_attribute_3'].toString();
       String billingDetail= decodedResponse['user']['user_attribute_4'].toString();
-      List<String> finalResponse= [userId, name, email, image, detail, billingDetail];
+      String likedPostsIndices= decodedResponse['user']['user_attribute_2'].toString();
+      List<String> finalResponse= [userId, name, email, image, detail, billingDetail, likedPostsIndices];
       return finalResponse;
     } else {
-      return ['error', 'error', 'error', 'error', 'error<divider%54>error<divider%54>error<divider%54>error', 'error<divider%54>error'];
+      return ['error', 'error', 'error', 'error', 'error<divider%54>error<divider%54>error<divider%54>error', 'error<divider%54>error', 'error'];
     }
   }
 

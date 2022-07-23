@@ -85,12 +85,11 @@ class _RootPageState extends State<RootPage> {
   }
 
   getBody() {
-    String id= widget.responseList[3];
     return IndexedStack(
       index: activeTab,
       children: [
         HomeSlide(responseList: widget.responseList),
-        const DebugSlide(),
+        DebugSlide(token: widget.responseList[1]),
         MeSlide(responseList: widget.responseList),
       ],
     );

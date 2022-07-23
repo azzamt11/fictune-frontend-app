@@ -1,9 +1,6 @@
-import 'dart:math';
-
-import 'package:fictune_frontend/network_and_data/NetworkHandler.dart';
 import 'package:flutter/material.dart';
 
-import '../components/NovelDirectCard.dart';
+import '../components/FavoriteNovelScrollComponent.dart';
 import '../helper/AppFunctions.dart';
 import '../helper/AppTheme.dart';
 import '../components/MyNovelScrollComponent.dart';
@@ -182,14 +179,8 @@ class _MeSlideState extends State<MeSlide> {
                       children: [
                         SingleChildScrollView(
                           scrollDirection: Axis.vertical,
-                          child: SizedBox(
-                            height: 300,
-                            width: size.width,
-                            child: const Center(
-                              child: Text('In Progress'),
-                            )
-                          ),
-                        ),
+                          child: FavoriteNovelScrollComponent(token: token),
+                            ),
                         SingleChildScrollView(
                           scrollDirection: Axis.vertical,
                           child: MyNovelScrollComponent(token: token),
